@@ -36,6 +36,10 @@ struct Args {
     #[argh(option, short = 'o', long = "out")]
     /// what to write
     out_format: Out,
+
+    #[argh(switch, short = 'p')]
+    /// pretty-print (where supported)
+    pretty: bool,
 }
 
 #[derive(Debug, EnumString)]
@@ -143,28 +147,48 @@ fn main() {
             }),
     };
 
+    let pretty = args.pretty;
     let mut serializer: Box<dyn Serializer> = match args.out_format {
         #[cfg(feature = "ser-json")]
         Out::Json => args
             .out_file
             .map(|path| {
-                File::create(path)
-                    .unwrap()
-                    .pipe(serde_json::Serializer::new)
-                    .pipe(Box::new)
-                    .pipe(Box::leak)
-                    .pipe(Serializer::erase)
-                    .pipe(Box::new)
-                    .pipe(|s| s as Box<dyn Serializer>)
+                File::create(path).unwrap().pipe(|file| {
+                    if pretty {
+                        file.pipe(serde_json::Serializer::pretty)
+                            .pipe(Box::new)
+                            .pipe(Box::leak)
+                            .pipe(Serializer::erase)
+                            .pipe(Box::new)
+                            .pipe(|s| s as Box<dyn Serializer>)
+                    } else {
+                        file.pipe(serde_json::Serializer::new)
+                            .pipe(Box::new)
+                            .pipe(Box::leak)
+                            .pipe(Serializer::erase)
+                            .pipe(Box::new)
+                            .pipe(|s| s as Box<dyn Serializer>)
+                    }
+                })
             })
             .unwrap_or_else(|| {
-                stdout()
-                    .pipe(serde_json::Serializer::new)
-                    .pipe(Box::new)
-                    .pipe(Box::leak)
-                    .pipe(Serializer::erase)
-                    .pipe(Box::new)
-                    .pipe(|s| s as Box<dyn Serializer>)
+                if pretty {
+                    stdout()
+                        .pipe(serde_json::Serializer::pretty)
+                        .pipe(Box::new)
+                        .pipe(Box::leak)
+                        .pipe(Serializer::erase)
+                        .pipe(Box::new)
+                        .pipe(|s| s as Box<dyn Serializer>)
+                } else {
+                    stdout()
+                        .pipe(serde_json::Serializer::new)
+                        .pipe(Box::new)
+                        .pipe(Box::leak)
+                        .pipe(Serializer::erase)
+                        .pipe(Box::new)
+                        .pipe(|s| s as Box<dyn Serializer>)
+                }
             }),
     };
 
