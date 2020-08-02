@@ -1,20 +1,14 @@
 use std::io::Read;
 use {
     argh::FromArgs,
-    erased_serde::{Deserializer, Serialize as _, Serializer},
-    serde_transcode::Transcoder,
+    serde_any::Object,
     std::{
         fs::File,
         io::{stdin, stdout},
         path::PathBuf,
     },
     strum::EnumString,
-    wyz::Pipe as _,
 };
-
-#[cfg(feature = "de-taml")]
-use logos::Logos;
-use taml::parser::{Taml, TamlValue};
 
 #[derive(Debug, FromArgs)]
 /// Transcode one self-describing format into another.
@@ -51,6 +45,10 @@ enum In {
     #[cfg(feature = "de-taml")]
     #[strum(serialize = "taml")]
     Taml,
+
+    #[cfg(feature = "de-yaml")]
+    #[strum(serialize = "yaml")]
+    Yaml,
 }
 
 #[derive(Debug, EnumString)]
@@ -58,6 +56,10 @@ enum Out {
     #[cfg(feature = "ser-json")]
     #[strum(serialize = "json")]
     Json,
+
+    #[cfg(feature = "ser-yaml")]
+    #[strum(serialize = "yaml")]
+    Yaml,
 }
 
 fn main() {
@@ -65,136 +67,77 @@ fn main() {
 
     //TODO: Avoid leaking.
 
-    let deserializer: Box<dyn Deserializer> = match args.in_format {
+    let object: Object = match args.in_format {
         #[cfg(feature = "de-json")]
-        In::Json => args
-            .in_file
-            .map(|path| {
-                File::open(path)
-                    .unwrap()
-                    .pipe(serde_json::Deserializer::from_reader)
-                    .pipe(Box::new)
-                    .pipe(Box::leak)
-                    .pipe(Deserializer::erase)
-                    .pipe(Box::new)
-                    .pipe(|d| d as Box<dyn Deserializer>)
-            })
-            .unwrap_or_else(|| {
-                stdin()
-                    .pipe(serde_json::Deserializer::from_reader)
-                    .pipe(Box::new)
-                    .pipe(Box::leak)
-                    .pipe(Deserializer::erase)
-                    .pipe(Box::new)
-                    .pipe(|d| d as Box<dyn Deserializer>)
-            }),
+        In::Json => {
+            let mut text = String::new();
+            if let Some(path) = args.in_file {
+                File::open(path).unwrap().read_to_string(&mut text).unwrap();
+            } else {
+                stdin().read_to_string(&mut text).unwrap();
+            }
+            let object: Object = serde_json::from_str(&text).unwrap();
+            object.into_owned()
+        }
 
         #[cfg(feature = "de-taml")]
-        In::Taml => args
-            .in_file
-            .map(|path| {
-                let diagnostics = vec![];
-                let diagnostics = Box::new(diagnostics);
-                let diagnostics = Box::leak(diagnostics);
-
-                File::open(path)
-                    .unwrap()
-                    .pipe(|mut f| {
-                        let mut text = String::new();
-                        f.read_to_string(&mut text).unwrap();
-                        text
-                    })
-                    .pipe(Box::new)
-                    .pipe(Box::leak)
-                    .pipe(|text| taml::token::Token::lexer(&*text))
-                    .pipe(|tokens| taml::parser::parse(tokens, diagnostics).unwrap())
-                    .pipe(|root_map| Taml {
-                        span: ()..(),
-                        value: TamlValue::Map(root_map),
-                    })
-                    .pipe(Box::new)
-                    .pipe(Box::leak)
-                    .pipe(move |root| taml::deserializer::Deserializer(&*root, diagnostics))
-                    .pipe(Box::new)
-                    .pipe(Box::leak)
-                    .pipe(Deserializer::erase)
-                    .pipe(Box::new)
-                    .pipe(|d| d as Box<dyn Deserializer>)
-            })
-            .unwrap_or_else(|| {
-                let diagnostics = vec![];
-                let diagnostics = Box::new(diagnostics);
-                let diagnostics = Box::leak(diagnostics);
-
-                let mut text = String::new();
+        In::Taml => {
+            let diagnostics = vec![];
+            let diagnostics = Box::new(diagnostics);
+            let diagnostics = Box::leak(diagnostics);
+            let mut text = String::new();
+            if let Some(path) = args.in_file {
+                File::open(path).unwrap().read_to_string(&mut text).unwrap();
+            } else {
                 stdin().read_to_string(&mut text).unwrap();
-                let text = Box::new(text);
-                let text = Box::leak(text);
-                let lexer = taml::token::Token::lexer(text).spanned();
-                let root_map = taml::parser::parse(lexer, diagnostics).unwrap();
-                #[allow(clippy::reversed_empty_ranges)]
-                let root = Taml {
-                    span: 0..0,
-                    value: TamlValue::Map(root_map),
-                };
-                let root = Box::new(root);
-                let root = Box::leak(root);
-                let deserializer = taml::deserializer::Deserializer(root, diagnostics);
-                let deserializer = Box::new(deserializer);
-                let deserializer = Box::leak(deserializer);
-                let erased = Deserializer::erase(deserializer);
-                Box::new(erased)
-            }),
+            }
+            let object: Object = taml::deserializer::from_str(&text, diagnostics).unwrap();
+            object.into_owned()
+        }
+
+        #[cfg(feature = "de-yaml")]
+        In::Yaml => {
+            let mut text = String::new();
+            if let Some(path) = args.in_file {
+                File::open(path).unwrap().read_to_string(&mut text).unwrap();
+            } else {
+                stdin().read_to_string(&mut text).unwrap();
+            }
+            todo!("YAML doesn't support borrowing deserialization. Find a workaround.");
+            // let object: Object = serde_yaml::from_str(&text).unwrap();
+            // object.into_owned()
+        }
     };
 
     let pretty = args.pretty;
-    let mut serializer: Box<dyn Serializer> = match args.out_format {
+    match args.out_format {
         #[cfg(feature = "ser-json")]
-        Out::Json => args
-            .out_file
-            .map(|path| {
-                File::create(path).unwrap().pipe(|file| {
-                    if pretty {
-                        file.pipe(serde_json::Serializer::pretty)
-                            .pipe(Box::new)
-                            .pipe(Box::leak)
-                            .pipe(Serializer::erase)
-                            .pipe(Box::new)
-                            .pipe(|s| s as Box<dyn Serializer>)
-                    } else {
-                        file.pipe(serde_json::Serializer::new)
-                            .pipe(Box::new)
-                            .pipe(Box::leak)
-                            .pipe(Serializer::erase)
-                            .pipe(Box::new)
-                            .pipe(|s| s as Box<dyn Serializer>)
-                    }
-                })
-            })
-            .unwrap_or_else(|| {
+        Out::Json => {
+            if let Some(path) = args.out_file {
+                let file = File::create(path).unwrap();
                 if pretty {
-                    stdout()
-                        .pipe(serde_json::Serializer::pretty)
-                        .pipe(Box::new)
-                        .pipe(Box::leak)
-                        .pipe(Serializer::erase)
-                        .pipe(Box::new)
-                        .pipe(|s| s as Box<dyn Serializer>)
+                    serde_json::to_writer_pretty(file, &object).unwrap()
                 } else {
-                    stdout()
-                        .pipe(serde_json::Serializer::new)
-                        .pipe(Box::new)
-                        .pipe(Box::leak)
-                        .pipe(Serializer::erase)
-                        .pipe(Box::new)
-                        .pipe(|s| s as Box<dyn Serializer>)
+                    serde_json::to_writer(file, &object).unwrap()
                 }
-            }),
+            } else if pretty {
+                serde_json::to_writer_pretty(stdout(), &object).unwrap()
+            } else {
+                serde_json::to_writer(stdout(), &object).unwrap()
+            }
+        }
+
+        #[cfg(feature = "ser-yaml")]
+        Out::Yaml => {
+            if let Some(path) = args.out_file {
+                let file = File::create(path).unwrap();
+                serde_yaml::to_writer(file, &object).unwrap()
+            } else {
+                serde_yaml::to_writer(stdout(), &object).unwrap()
+            }
+        }
     };
 
-    Transcoder::new(deserializer)
-        .erased_serialize(&mut serializer)
-        .unwrap();
-
+    // Flush stdout.
     println!()
 }
