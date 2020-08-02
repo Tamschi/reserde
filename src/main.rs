@@ -2,6 +2,7 @@ use std::io::Read;
 use {
     argh::FromArgs,
     serde_any::Object,
+    serde_detach::detach,
     std::{
         fs::File,
         io::{stdin, stdout},
@@ -76,8 +77,7 @@ fn main() {
             } else {
                 stdin().read_to_string(&mut text).unwrap();
             }
-            let object: Object = serde_json::from_str(&text).unwrap();
-            object.into_owned()
+            detach(serde_json::from_str(&text)).unwrap()
         }
 
         #[cfg(feature = "de-taml")]
@@ -91,8 +91,7 @@ fn main() {
             } else {
                 stdin().read_to_string(&mut text).unwrap();
             }
-            let object: Object = taml::deserializer::from_str(&text, diagnostics).unwrap();
-            object.into_owned()
+            detach(taml::deserializer::from_str(&text, diagnostics)).unwrap()
         }
 
         #[cfg(feature = "de-yaml")]
@@ -103,9 +102,7 @@ fn main() {
             } else {
                 stdin().read_to_string(&mut text).unwrap();
             }
-            todo!("YAML doesn't support borrowing deserialization. Find a workaround.");
-            // let object: Object = serde_yaml::from_str(&text).unwrap();
-            // object.into_owned()
+            detach(serde_yaml::from_str(&text)).unwrap()
         }
     };
 

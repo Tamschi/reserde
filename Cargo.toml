@@ -7,19 +7,20 @@ publish = false
 
 [features]
 default = ["de-json", "ser-json", "de-taml", "de-yaml", "ser-yaml"]
-de-json = ["serde_json"]
+de-json = ["serde_json", "serde-detach"]
 ser-json = ["serde_json"]
-de-taml = ["taml", "logos"]
-de-yaml = ["serde_yaml"]
+de-taml = ["taml", "logos", "serde-detach"]
+de-yaml = ["serde_yaml", "serde-detach"]
 ser-yaml = ["serde_yaml"]
 
 [dependencies]
 argh = "0.1.3"
 logos = { version = "0.11.4", optional = true, default-features = false, features = ["std"] }
 serde = "1.0.114"
+serde-any = { path = "../serde-any" }
+serde-detach = { path = "../serde-detach", optional = true }
 serde_json = { version = "1.0.57", optional = true } #TODO: Check out features.
 serde_yaml = { version = "0.8.13", optional = true }
 strum = { version = "0.19.1", features = ["derive"] }
 taml = { path = "../taml", optional = true } #TODO: "de" and "ser" features?
 wyz = "0.2.0"
-serde-any = { path = "../serde-any" }
