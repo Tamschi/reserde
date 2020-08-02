@@ -84,7 +84,7 @@ fn main() {
             } else {
                 stdin().read_to_string(&mut text).unwrap();
             }
-            detach(serde_json::from_str(&text)).unwrap()
+            serde_json::from_str(&text).map(detach).unwrap()
         }
 
         #[cfg(feature = "de-taml")]
@@ -98,7 +98,9 @@ fn main() {
             } else {
                 stdin().read_to_string(&mut text).unwrap();
             }
-            detach(taml::deserializer::from_str(&text, diagnostics)).unwrap()
+            taml::deserializer::from_str(&text, diagnostics)
+                .map(detach)
+                .unwrap()
         }
 
         #[cfg(feature = "de-xml")]
@@ -109,7 +111,7 @@ fn main() {
             } else {
                 stdin().read_to_string(&mut text).unwrap();
             }
-            detach(quick_xml::de::from_str(&text)).unwrap()
+            quick_xml::de::from_str(&text).map(detach).unwrap()
         }
 
         #[cfg(feature = "de-yaml")]
@@ -120,7 +122,7 @@ fn main() {
             } else {
                 stdin().read_to_string(&mut text).unwrap();
             }
-            detach(serde_yaml::from_str(&text)).unwrap()
+            serde_yaml::from_str(&text).map(detach).unwrap()
         }
     };
 
