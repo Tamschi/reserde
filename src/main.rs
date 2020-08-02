@@ -47,6 +47,10 @@ enum In {
     #[strum(serialize = "taml")]
     Taml,
 
+    #[cfg(feature = "de-xml")]
+    #[strum(serialize = "xml")]
+    Xml,
+
     #[cfg(feature = "de-yaml")]
     #[strum(serialize = "yaml")]
     Yaml,
@@ -57,6 +61,9 @@ enum Out {
     #[cfg(feature = "ser-json")]
     #[strum(serialize = "json")]
     Json,
+    #[cfg(feature = "ser-xml")]
+    #[strum(serialize = "xml")]
+    Xml,
 
     #[cfg(feature = "ser-yaml")]
     #[strum(serialize = "yaml")]
@@ -94,6 +101,17 @@ fn main() {
             detach(taml::deserializer::from_str(&text, diagnostics)).unwrap()
         }
 
+        #[cfg(feature = "de-xml")]
+        In::Xml => {
+            let mut text = String::new();
+            if let Some(path) = args.in_file {
+                File::open(path).unwrap().read_to_string(&mut text).unwrap();
+            } else {
+                stdin().read_to_string(&mut text).unwrap();
+            }
+            detach(quick_xml::de::from_str(&text)).unwrap()
+        }
+
         #[cfg(feature = "de-yaml")]
         In::Yaml => {
             let mut text = String::new();
@@ -121,6 +139,16 @@ fn main() {
                 serde_json::to_writer_pretty(stdout(), &object).unwrap()
             } else {
                 serde_json::to_writer(stdout(), &object).unwrap()
+            }
+        }
+
+        #[cfg(feature = "ser-xml")]
+        Out::Xml => {
+            if let Some(path) = args.out_file {
+                let file = File::create(path).unwrap();
+                quick_xml::se::to_writer(file, &object).unwrap()
+            } else {
+                quick_xml::se::to_writer(stdout(), &object).unwrap()
             }
         }
 
