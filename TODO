@@ -1,2 +1,2 @@
 - Some of these formats (not YAML 😒) do support streaming conversions using `serde-transcode`.
-    That should ideally be used where possible instead of going through `serde-any` each time.
+    That should ideally be used where possible instead of going through `serde-object` each time.

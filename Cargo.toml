@@ -19,7 +19,7 @@ ser-yaml = ["serde_yaml"]
 argh = "0.1.3"
 quick-xml = { version = "0.18.1", optional = true, features = ["serialize"] }
 serde = "1.0.114"
-serde-any = { path = "../serde-any" }
+serde-object = { path = "../serde-object" }
 serde-detach = { path = "../serde-detach", optional = true }
 serde_json = { version = "1.0.57", optional = true } #TODO: Check out features.
 serde_yaml = { version = "0.8.13", optional = true }

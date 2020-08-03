@@ -1,8 +1,8 @@
 use std::io::Read;
 use {
     argh::FromArgs,
-    serde_any::Object,
     serde_detach::detach,
+    serde_object::Object,
     std::{
         fs::File,
         io::{stdin, stdout},
@@ -13,6 +13,8 @@ use {
 
 #[derive(Debug, FromArgs)]
 /// Transcode one self-describing format into another.
+///
+/// Currently supports JSON (--pretty), TAML (--in only), XML and YAML.
 struct Args {
     #[argh(option, long = "if")]
     /// where to read input from. Defaults to stdin
