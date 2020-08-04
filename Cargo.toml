@@ -6,7 +6,9 @@ edition = "2018"
 publish = false
 
 [features]
-default = ["de-json", "ser-json", "de-taml", "de-xml", "ser-xml", "de-yaml", "ser-yaml"]
+default = ["de-cbor", "ser-cbor", "de-json", "ser-json", "de-taml", "de-xml", "ser-xml", "de-yaml", "ser-yaml"]
+de-cbor = ["serde_cbor", "serde-detach"]
+ser-cbor = ["serde_cbor"]
 de-json = ["serde_json", "serde-detach"]
 ser-json = ["serde_json"]
 de-taml = ["taml", "serde-detach"]
@@ -21,6 +23,7 @@ quick-xml = { version = "0.18.1", optional = true, features = ["serialize"] }
 serde = "1.0.114"
 serde-object = { path = "../serde-object" }
 serde-detach = { path = "../serde-detach", optional = true }
+serde_cbor = { version = "0.11.1", optional = true }
 serde_json = { version = "1.0.57", optional = true } #TODO: Check out features.
 serde_yaml = { version = "0.8.13", optional = true }
 strum = { version = "0.19.1", features = ["derive"] }

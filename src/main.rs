@@ -9,6 +9,7 @@ use {
         path::PathBuf,
     },
     strum::EnumString,
+    wyz::Pipe as _,
 };
 
 #[derive(Debug, FromArgs)]
@@ -41,6 +42,10 @@ struct Args {
 
 #[derive(Debug, EnumString)]
 enum In {
+    #[cfg(feature = "de-cbor")]
+    #[strum(serialize = "cbor")]
+    Cbor,
+
     #[cfg(feature = "de-json")]
     #[strum(serialize = "json")]
     Json,
@@ -60,9 +65,14 @@ enum In {
 
 #[derive(Debug, EnumString)]
 enum Out {
+    #[cfg(feature = "ser-cbor")]
+    #[strum(serialize = "cbor")]
+    Cbor,
+
     #[cfg(feature = "ser-json")]
     #[strum(serialize = "json")]
     Json,
+
     #[cfg(feature = "ser-xml")]
     #[strum(serialize = "xml")]
     Xml,
@@ -78,6 +88,17 @@ fn main() {
     //TODO: Avoid leaking.
 
     let object: Object = match args.in_format {
+        #[cfg(feature = "de-cbor")]
+        In::Cbor => if let Some(path) = args.in_file {
+            File::open(path)
+                .unwrap()
+                .pipe(serde_cbor::from_reader)
+                .map(detach)
+        } else {
+            stdin().pipe(serde_cbor::from_reader).map(detach)
+        }
+        .unwrap(),
+
         #[cfg(feature = "de-json")]
         In::Json => {
             let mut text = String::new();
@@ -130,6 +151,15 @@ fn main() {
 
     let pretty = args.pretty;
     match args.out_format {
+        #[cfg(feature = "ser-cbor")]
+        Out::Cbor => {
+            if let Some(path) = args.out_file {
+                serde_cbor::to_writer(File::create(path).unwrap(), &object).unwrap()
+            } else {
+                serde_cbor::to_writer(stdout(), &object).unwrap()
+            }
+        }
+
         #[cfg(feature = "ser-json")]
         Out::Json => {
             if let Some(path) = args.out_file {
