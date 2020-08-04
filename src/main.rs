@@ -5,7 +5,7 @@ use {
     serde_object::Object,
     std::{
         fs::File,
-        io::{stdin, stdout},
+        io::{stdin, stdout, Write as _},
         path::PathBuf,
     },
     strum::EnumString,
@@ -15,7 +15,8 @@ use {
 #[derive(Debug, FromArgs)]
 /// Transcode one self-describing format into another.
 ///
-/// Currently supports JSON (--pretty), TAML (--in only), XML and YAML.
+/// Currently supports CBOR, JSON (--pretty), TAML (--in only), XML, x-www-form-urlencoded (as urlencoded) and YAML.
+/// All names are lowercase.
 struct Args {
     #[argh(option, long = "if")]
     /// where to read input from. Defaults to stdin
@@ -54,6 +55,10 @@ enum In {
     #[strum(serialize = "taml")]
     Taml,
 
+    #[cfg(feature = "de-urlencoded")]
+    #[strum(serialize = "urlencoded")]
+    Urlencoded,
+
     #[cfg(feature = "de-xml")]
     #[strum(serialize = "xml")]
     Xml,
@@ -72,6 +77,10 @@ enum Out {
     #[cfg(feature = "ser-json")]
     #[strum(serialize = "json")]
     Json,
+
+    #[cfg(feature = "ser-urlencoded")]
+    #[strum(serialize = "urlencoded")]
+    Urlencoded,
 
     #[cfg(feature = "ser-xml")]
     #[strum(serialize = "xml")]
@@ -126,6 +135,17 @@ fn main() {
                 .unwrap()
         }
 
+        #[cfg(feature = "de-urlencoded")]
+        In::Urlencoded => if let Some(path) = args.in_file {
+            File::open(path)
+                .unwrap()
+                .pipe(serde_urlencoded::from_reader)
+                .map(detach)
+        } else {
+            stdin().pipe(serde_urlencoded::from_reader).map(detach)
+        }
+        .unwrap(),
+
         #[cfg(feature = "de-xml")]
         In::Xml => {
             let mut text = String::new();
@@ -176,6 +196,17 @@ fn main() {
             }
         }
 
+        #[cfg(feature = "ser-urlencoded")]
+        Out::Urlencoded => {
+            let text = serde_urlencoded::to_string(&object).unwrap();
+
+            if let Some(path) = args.out_file {
+                write!(File::create(path).unwrap(), "{}", text).unwrap();
+            } else {
+                print!("{}", text)
+            }
+        }
+
         #[cfg(feature = "ser-xml")]
         Out::Xml => {
             if let Some(path) = args.out_file {
@@ -197,6 +228,5 @@ fn main() {
         }
     };
 
-    // Flush stdout.
-    println!()
+    stdout().flush().unwrap()
 }

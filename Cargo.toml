@@ -6,12 +6,14 @@ edition = "2018"
 publish = false
 
 [features]
-default = ["de-cbor", "ser-cbor", "de-json", "ser-json", "de-taml", "de-xml", "ser-xml", "de-yaml", "ser-yaml"]
+default = ["de-cbor", "ser-cbor", "de-json", "ser-json", "de-taml", "de-urlencoded", "ser-urlencoded", "de-xml", "ser-xml", "de-yaml", "ser-yaml"]
 de-cbor = ["serde_cbor", "serde-detach"]
 ser-cbor = ["serde_cbor"]
 de-json = ["serde_json", "serde-detach"]
 ser-json = ["serde_json"]
 de-taml = ["taml", "serde-detach"]
+de-urlencoded = ["serde_urlencoded", "serde-detach"]
+ser-urlencoded = ["serde_urlencoded"]
 de-xml = ["quick-xml", "serde-detach"]
 ser-xml = ["quick-xml"]
 de-yaml = ["serde_yaml", "serde-detach"]
@@ -29,3 +31,4 @@ serde_yaml = { version = "0.8.13", optional = true }
 strum = { version = "0.19.1", features = ["derive"] }
 taml = { path = "../taml", optional = true, features = ["serde-object-assist"] } #TODO: "de" and "ser" features?
 wyz = "0.2.0"
+serde_urlencoded = { version = "0.6.1", optional = true }
