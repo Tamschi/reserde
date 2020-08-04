@@ -24,5 +24,5 @@ serde-detach = { path = "../serde-detach", optional = true }
 serde_json = { version = "1.0.57", optional = true } #TODO: Check out features.
 serde_yaml = { version = "0.8.13", optional = true }
 strum = { version = "0.19.1", features = ["derive"] }
-taml = { path = "../taml", optional = true } #TODO: "de" and "ser" features?
+taml = { path = "../taml", optional = true, features = ["serde-object-assist"] } #TODO: "de" and "ser" features?
 wyz = "0.2.0"
