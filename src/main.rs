@@ -1,11 +1,11 @@
-use std::io::Read;
 use {
     argh::FromArgs,
     serde_detach::detach,
     serde_object::Object,
     std::{
+        borrow::Cow,
         fs::File,
-        io::{stdin, stdout, Write as _},
+        io::{stdin, stdout, Read as _, Write as _},
         path::PathBuf,
     },
     strum::EnumString,
@@ -15,7 +15,7 @@ use {
 #[derive(Debug, FromArgs)]
 /// Transcode one self-describing format into another.
 ///
-/// Currently supports CBOR, JSON (--pretty), TAML (--in only), XML, x-www-form-urlencoded (as urlencoded) and YAML.
+/// Currently supports Bencode, CBOR, JSON (--pretty), TAML (--in only), XML, x-www-form-urlencoded (as urlencoded) and YAML.
 /// All names are lowercase.
 struct Args {
     #[argh(option, long = "if")]
@@ -39,10 +39,19 @@ struct Args {
     #[argh(switch, short = 'p')]
     /// pretty-print (where supported)
     pretty: bool,
+
+    #[cfg(feature = "stringify")]
+    #[argh(option, short = 's')]
+    /// stringify bytes and non-string value keys into strings where possible, possible values are: utf8. (Tries encodings in the order specified.)
+    stringify: Vec<Encoding>,
 }
 
-#[derive(Debug, EnumString)]
+#[derive(Debug, EnumString, Clone, Copy)]
 enum In {
+    #[cfg(feature = "de-bencode")]
+    #[strum(serialize = "bencode")]
+    Bencode,
+
     #[cfg(feature = "de-cbor")]
     #[strum(serialize = "cbor")]
     Cbor,
@@ -68,8 +77,12 @@ enum In {
     Yaml,
 }
 
-#[derive(Debug, EnumString)]
+#[derive(Debug, EnumString, Clone, Copy)]
 enum Out {
+    #[cfg(feature = "ser-bencode")]
+    #[strum(serialize = "bencode")]
+    Bencode,
+
     #[cfg(feature = "ser-cbor")]
     #[strum(serialize = "cbor")]
     Cbor,
@@ -91,12 +104,30 @@ enum Out {
     Yaml,
 }
 
+#[cfg(feature = "stringify")]
+#[derive(Debug, EnumString, Clone, Copy)]
+enum Encoding {
+    #[strum(serialize = "utf8")]
+    Utf8,
+}
+
 fn main() {
     let args: Args = argh::from_env();
 
     //TODO: Avoid leaking.
 
-    let object: Object = match args.in_format {
+    let mut object: Object = match args.in_format {
+        #[cfg(feature = "de-bencode")]
+        In::Bencode => {
+            let mut data = vec![];
+            if let Some(path) = args.in_file {
+                File::open(path).unwrap().read_to_end(&mut data).unwrap();
+            } else {
+                stdin().read_to_end(&mut data).unwrap();
+            }
+            serde_bencode::from_bytes(&data).map(detach).unwrap()
+        }
+
         #[cfg(feature = "de-cbor")]
         In::Cbor => if let Some(path) = args.in_file {
             File::open(path)
@@ -169,8 +200,24 @@ fn main() {
         }
     };
 
+    #[cfg(feature = "stringify")]
+    for encoding in args.stringify {
+        stringify(&mut object, encoding)
+    }
+
     let pretty = args.pretty;
     match args.out_format {
+        #[cfg(feature = "ser-bencode")]
+        Out::Bencode => {
+            let data = serde_bencode::to_bytes(&object).unwrap();
+
+            if let Some(path) = args.out_file {
+                File::create(path).unwrap().write_all(&data).unwrap();
+            } else {
+                stdout().write_all(&data).unwrap();
+            }
+        }
+
         #[cfg(feature = "ser-cbor")]
         Out::Cbor => {
             if let Some(path) = args.out_file {
@@ -229,4 +276,123 @@ fn main() {
     };
 
     stdout().flush().unwrap()
+}
+
+fn stringify<'a>(object: &mut Object<'a>, encoding: Encoding) {
+    match object {
+        Object::Bool(_)
+        | Object::I8(_)
+        | Object::I16(_)
+        | Object::I32(_)
+        | Object::I64(_)
+        | Object::I128(_)
+        | Object::U8(_)
+        | Object::U16(_)
+        | Object::U32(_)
+        | Object::U64(_)
+        | Object::U128(_)
+        | Object::F32(_)
+        | Object::F64(_)
+        | Object::Char(_)
+        | Object::String(_) => {} // Do nothing.
+        Object::ByteArray(_) => stringify_value(object, encoding),
+        Object::Option(Some(b)) => stringify(b, encoding),
+        Object::Option(None) | Object::Unit | Object::UnitStruct { name: _ } => {} // Do nothing.
+        Object::UnitVariant { name: _, variant } => stringify_value(variant, encoding),
+        Object::NewtypeStruct { name: _, value } => stringify(value, encoding),
+        Object::NewtypeVariant {
+            name: _,
+            variant,
+            value,
+        } => {
+            stringify_value(variant, encoding);
+            stringify(value, encoding)
+        }
+        Object::Seq(list) => stringify_keys_iter(list.iter_mut(), encoding),
+        Object::Tuple(fields) => stringify_keys_iter(fields.iter_mut(), encoding),
+        Object::TupleStruct { name: _, fields } => stringify_keys_iter(fields.iter_mut(), encoding),
+        Object::TupleVariant {
+            name: _,
+            variant,
+            fields,
+        } => {
+            stringify_value(variant, encoding);
+            stringify(fields.as_mut(), encoding)
+        }
+        Object::Map(map) => {
+            for (k, v) in map.iter_mut() {
+                stringify_value(k, encoding);
+                stringify(v, encoding)
+            }
+        }
+        Object::Struct { name: _, fields } => {
+            stringify_keys_iter(fields.iter_mut().map(|(_, v)| v), encoding)
+        }
+        Object::StructVariant {
+            name: _,
+            variant,
+            fields,
+        } => {
+            stringify_value(variant, encoding);
+            stringify(fields, encoding)
+        }
+    }
+}
+
+fn stringify_keys_iter<'a, 'b: 'a>(
+    iter: impl IntoIterator<Item = &'a mut Object<'b>>,
+    encoding: Encoding,
+) {
+    for item in iter.into_iter() {
+        stringify(item, encoding)
+    }
+}
+
+fn stringify_value<'a>(object: &mut Object<'a>, encoding: Encoding) {
+    *object = Object::String(
+        match object {
+            Object::Bool(value) => value.to_string(),
+            Object::I8(value) => value.to_string(),
+            Object::I16(value) => value.to_string(),
+            Object::I32(value) => value.to_string(),
+            Object::I64(value) => value.to_string(),
+            Object::I128(value) => value.to_string(),
+            Object::U8(value) => value.to_string(),
+            Object::U16(value) => value.to_string(),
+            Object::U32(value) => value.to_string(),
+            Object::U64(value) => value.to_string(),
+            Object::U128(value) => value.to_string(),
+            Object::F32(value) => value.to_string(),
+            Object::F64(value) => value.to_string(),
+            Object::Char(value) => value.to_string(),
+            Object::String(_) => return,
+            Object::ByteArray(bytes) => match String::from_utf8(bytes.iter().copied().collect()) {
+                Ok(string) => string,
+                Err(_) => {
+                    return;
+                }
+            },
+            Object::Option(option) => {
+                if let Some(obj) = option.as_deref_mut() {
+                    stringify_value(obj, encoding)
+                }
+                return;
+            }
+            Object::Unit
+            | Object::UnitStruct { .. }
+            | Object::UnitVariant { .. }
+            | Object::NewtypeStruct { .. }
+            | Object::NewtypeVariant { .. }
+            | Object::Seq(_)
+            | Object::Tuple(_)
+            | Object::TupleStruct { .. }
+            | Object::TupleVariant { .. }
+            | Object::Map(_)
+            | Object::Struct { .. }
+            | Object::StructVariant { .. } => {
+                return;
+            }
+        }
+        .pipe(Cow::Owned),
+    )
 }
