@@ -366,8 +366,8 @@ fn stringify_value<'a>(object: &mut Object<'a>, encoding: Encoding) {
             Object::F64(value) => value.to_string(),
             Object::Char(value) => value.to_string(),
             Object::String(_) => return,
-            Object::ByteArray(bytes) => match String::from_utf8(bytes.iter().copied().collect()) {
-                Ok(string) => string,
+            Object::ByteArray(bytes) => match std::str::from_utf8(bytes.as_ref()) {
+                Ok(str) => str.to_string(),
                 Err(_) => {
                     return;
                 }
