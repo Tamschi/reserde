@@ -6,7 +6,8 @@ edition = "2018"
 publish = false
 
 [features]
-default = ["stringify", "de-bencode", "ser-bencode", "de-cbor", "ser-cbor", "de-json", "ser-json", "de-taml", "de-urlencoded", "ser-urlencoded", "de-xml", "ser-xml", "de-yaml", "ser-yaml"]
+default = ["enum-bools", "stringify", "de-bencode", "ser-bencode", "de-cbor", "ser-cbor", "de-json", "ser-json", "de-taml", "de-urlencoded", "ser-urlencoded", "de-xml", "ser-xml", "de-yaml", "ser-yaml"]
+enum-bools = []
 stringify = []
 de-bencode = ["serde_bencode"]
 ser-bencode = ["serde_bencode"]

@@ -42,8 +42,13 @@ struct Args {
 
     #[cfg(feature = "stringify")]
     #[argh(option, short = 's')]
-    /// stringify bytes and non-string value keys into strings where possible, possible values are: utf8. (Tries encodings in the order specified.)
+    /// stringify bytes and non-string value keys into strings where possible, possible values are: utf8. (Tries encodings in the order specified.) [try with: --in bencode]
     stringify: Vec<Encoding>,
+
+    #[cfg(feature = "enum-bools")]
+    #[argh(switch)]
+    /// case-insensitively convert unit variants with name `true` or `false` into booleans. [try with: --in taml]
+    enum_bools: bool,
 }
 
 #[derive(Debug, EnumString, Clone, Copy)]
@@ -205,6 +210,11 @@ fn main() {
         stringify(&mut object, encoding)
     }
 
+    #[cfg(feature = "enum-bools")]
+    if args.enum_bools {
+        convert_bool_variants(&mut object)
+    }
+
     let pretty = args.pretty;
     match args.out_format {
         #[cfg(feature = "ser-bencode")]
@@ -276,6 +286,96 @@ fn main() {
     };
 
     stdout().flush().unwrap()
+}
+
+// TODO: Simplify all this code by extracting a `recurse` function.
+
+fn convert_bool_variants<'a>(object: &mut Object<'a>) {
+    match object {
+        Object::Bool(_)
+        | Object::I8(_)
+        | Object::I16(_)
+        | Object::I32(_)
+        | Object::I64(_)
+        | Object::I128(_)
+        | Object::U8(_)
+        | Object::U16(_)
+        | Object::U32(_)
+        | Object::U64(_)
+        | Object::U128(_)
+        | Object::F32(_)
+        | Object::F64(_)
+        | Object::Char(_)
+        | Object::String(_)
+        | Object::ByteArray(_)
+        | Object::Option(_)
+        | Object::Unit
+        | Object::UnitStruct { .. } => {} // Do nothing.
+        Object::UnitVariant { name: _, variant } => {
+            convert_bool_variants(variant);
+            match variant.as_ref() {
+                Object::String(cow) if cow.to_ascii_lowercase() == "true" => {
+                    *object = Object::Bool(true)
+                }
+                Object::String(cow) if cow.to_ascii_lowercase() == "false" => {
+                    *object = Object::Bool(false)
+                }
+                Object::ByteArray(cow) if cow.to_ascii_lowercase() == b"true" => {
+                    *object = Object::Bool(true)
+                }
+                Object::ByteArray(cow) if cow.to_ascii_lowercase() == b"false" => {
+                    *object = Object::Bool(false)
+                }
+                _ => {} // Do nothing.
+            }
+        }
+        Object::NewtypeStruct { name: _, value } => convert_bool_variants(value),
+        Object::NewtypeVariant {
+            name: _,
+            variant,
+            value,
+        } => {
+            convert_bool_variants(variant);
+            convert_bool_variants(value)
+        }
+        Object::Seq(elements)
+        | Object::Tuple(elements)
+        | Object::TupleStruct {
+            name: _,
+            fields: elements,
+        } => convert_bool_variants_iter(elements.iter_mut()),
+        Object::TupleVariant {
+            name: _,
+            variant,
+            fields,
+        } => {
+            convert_bool_variants(variant);
+            convert_bool_variants(fields)
+        }
+        Object::Map(map) => {
+            for (k, v) in map.iter_mut() {
+                convert_bool_variants(k);
+                convert_bool_variants(v)
+            }
+        }
+        Object::Struct { name: _, fields } => {
+            convert_bool_variants_iter(fields.iter_mut().map(|(_, v)| v))
+        }
+        Object::StructVariant {
+            name: _,
+            variant,
+            fields,
+        } => {
+            convert_bool_variants(variant);
+            convert_bool_variants(fields)
+        }
+    }
+}
+
+fn convert_bool_variants_iter<'a, 'b: 'a>(iter: impl IntoIterator<Item = &'a mut Object<'b>>) {
+    for item in iter.into_iter() {
+        convert_bool_variants(item)
+    }
 }
 
 fn stringify<'a>(object: &mut Object<'a>, encoding: Encoding) {
