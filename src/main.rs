@@ -310,7 +310,8 @@ fn convert_bool_variants<'a>(object: &mut Object<'a>) {
         | Object::ByteArray(_)
         | Object::Option(_)
         | Object::Unit
-        | Object::UnitStruct { .. } => {} // Do nothing.
+        | Object::UnitStruct { .. }
+        | Object::DualVariantKey { .. } => {} // Do nothing.
         Object::UnitVariant { name: _, variant } => {
             convert_bool_variants(variant);
             match variant.as_ref() {
@@ -359,7 +360,7 @@ fn convert_bool_variants<'a>(object: &mut Object<'a>) {
             }
         }
         Object::Struct { name: _, fields } => {
-            convert_bool_variants_iter(fields.iter_mut().map(|(_, v)| v))
+            convert_bool_variants_iter(fields.iter_mut().filter_map(|(_, v)| v.as_mut()))
         }
         Object::StructVariant {
             name: _,
@@ -368,6 +369,14 @@ fn convert_bool_variants<'a>(object: &mut Object<'a>) {
         } => {
             convert_bool_variants(variant);
             convert_bool_variants(fields)
+        }
+        Object::FieldMap(map) => {
+            for (k, v) in map.iter_mut() {
+                convert_bool_variants(k);
+                if let Some(v) = v.as_mut() {
+                    convert_bool_variants(v)
+                }
+            }
         }
     }
 }
@@ -395,6 +404,9 @@ fn stringify<'a>(object: &mut Object<'a>, encoding: Encoding) {
         | Object::F64(_)
         | Object::Char(_)
         | Object::String(_) => {} // Do nothing.
+
+        Object::DualVariantKey { .. } => {} // Do nothing. A well-behaved serializer will get the appropriate version.
+
         Object::ByteArray(_) => stringify_value(object, encoding),
         Object::Option(Some(b)) => stringify(b, encoding),
         Object::Option(None) | Object::Unit | Object::UnitStruct { name: _ } => {} // Do nothing.
@@ -426,7 +438,7 @@ fn stringify<'a>(object: &mut Object<'a>, encoding: Encoding) {
             }
         }
         Object::Struct { name: _, fields } => {
-            stringify_keys_iter(fields.iter_mut().map(|(_, v)| v), encoding)
+            stringify_keys_iter(fields.iter_mut().filter_map(|(_, v)| v.as_mut()), encoding)
         }
         Object::StructVariant {
             name: _,
@@ -435,6 +447,14 @@ fn stringify<'a>(object: &mut Object<'a>, encoding: Encoding) {
         } => {
             stringify_value(variant, encoding);
             stringify(fields, encoding)
+        }
+        Object::FieldMap(map) => {
+            for (k, v) in map.iter_mut() {
+                stringify_value(k, encoding);
+                if let Some(v) = v.as_mut() {
+                    stringify(v, encoding)
+                }
+            }
         }
     }
 }
@@ -490,6 +510,10 @@ fn stringify_value<'a>(object: &mut Object<'a>, encoding: Encoding) {
             | Object::Map(_)
             | Object::Struct { .. }
             | Object::StructVariant { .. } => {
+                return;
+            }
+            Object::DualVariantKey { index: _, name } => name.to_string(),
+            Object::FieldMap(_) => {
                 return;
             }
         }
