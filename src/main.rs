@@ -15,7 +15,7 @@ use {
 #[derive(Debug, FromArgs)]
 /// Transcode one self-describing format into another.
 ///
-/// Currently supports Bencode, CBOR, JSON (--pretty), TAML (--in only), XML, x-www-form-urlencoded (as urlencoded) and YAML.
+/// Currently supports Bencode, Bincode (--out only), CBOR, JSON (--pretty), TAML (--in only), XML, x-www-form-urlencoded (as urlencoded) and YAML.
 /// All names are lowercase.
 struct Args {
     #[argh(option, long = "if")]
@@ -87,6 +87,10 @@ enum Out {
     #[cfg(feature = "ser-bencode")]
     #[strum(serialize = "bencode")]
     Bencode,
+
+    #[cfg(feature = "ser-bincode")]
+    #[strum(serialize = "bincode")]
+    Bincode,
 
     #[cfg(feature = "ser-cbor")]
     #[strum(serialize = "cbor")]
@@ -225,6 +229,15 @@ fn main() {
                 File::create(path).unwrap().write_all(&data).unwrap();
             } else {
                 stdout().write_all(&data).unwrap();
+            }
+        }
+
+        #[cfg(feature = "ser-bincode")]
+        Out::Bincode => {
+            if let Some(path) = args.out_file {
+                bincode::serialize_into(File::create(path).unwrap(), &object).unwrap();
+            } else {
+                bincode::serialize_into(stdout(), &object).unwrap();
             }
         }
 

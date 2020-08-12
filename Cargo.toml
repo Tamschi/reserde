@@ -6,11 +6,12 @@ edition = "2018"
 publish = false
 
 [features]
-default = ["enum-bools", "stringify", "de-bencode", "ser-bencode", "de-cbor", "ser-cbor", "de-json", "ser-json", "de-taml", "de-urlencoded", "ser-urlencoded", "de-xml", "ser-xml", "de-yaml", "ser-yaml"]
+default = ["enum-bools", "stringify", "de-bencode", "ser-bencode", "ser-bincode", "de-cbor", "ser-cbor", "de-json", "ser-json", "de-taml", "de-urlencoded", "ser-urlencoded", "de-xml", "ser-xml", "de-yaml", "ser-yaml"]
 enum-bools = []
 stringify = []
 de-bencode = ["serde_bencode"]
 ser-bencode = ["serde_bencode"]
+ser-bincode = ["bincode"]
 de-cbor = ["serde_cbor"]
 ser-cbor = ["serde_cbor"]
 de-json = ["serde_json"]
@@ -25,15 +26,16 @@ ser-yaml = ["serde_yaml"]
 
 [dependencies]
 argh = "0.1.3"
+bincode = { version = "1.3.1", optional = true }
 quick-xml = { version = "0.18.1", optional = true, features = ["serialize"] }
 serde = "1.0.114"
-serde-object = { path = "../serde-object" }
-serde-detach = { path = "../serde-detach" }
 serde_bencode = { version = "0.2.2", optional = true }
 serde_cbor = { version = "0.11.1", optional = true }
 serde_json = { version = "1.0.57", optional = true } #TODO: Check out features.
+serde_urlencoded = { version = "0.6.1", optional = true }
 serde_yaml = { version = "0.8.13", optional = true }
+serde-object = { path = "../serde-object" }
+serde-detach = { path = "../serde-detach" }
 strum = { version = "0.19.1", features = ["derive"] }
 taml = { path = "../taml", optional = true, features = ["serde-object-assist"] } #TODO: "de" and "ser" features?
 wyz = "0.2.0"
-serde_urlencoded = { version = "0.6.1", optional = true }
