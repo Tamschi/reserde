@@ -13,7 +13,7 @@ use {
 };
 
 #[derive(Debug, FromArgs)]
-/// Transcode one self-describing format into another.
+/// Transcode a self-describing format into a different format.
 ///
 /// Currently supports Bencode, Bincode (--out only), CBOR, JSON (--pretty), TAML (--in only), XML, x-www-form-urlencoded (as urlencoded) and YAML.
 /// All names are lowercase.
