@@ -1,6 +1,7 @@
 /.git* text eol=lf
 
 *.rs text eol=lf
+*.toml text eol=lf
 
-Cargo.toml text eol=lf
+.editorconfig text eol=lf
 TODO text eol=lf
