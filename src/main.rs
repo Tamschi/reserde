@@ -168,7 +168,7 @@ fn main() {
 			} else {
 				stdin().read_to_string(&mut text).unwrap();
 			}
-			taml::deserializer::from_str(&text, diagnostics)
+			serde_taml::de::from_str(&text, diagnostics)
 				.map(detach)
 				.unwrap()
 		}
