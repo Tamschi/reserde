@@ -10,7 +10,6 @@ include = [
 	"**/*.rs",
 	"Cargo.toml",
 ]
-publish = false
 
 [features]
 default = ["enum-bools", "stringify", "de-bencode", "ser-bencode", "ser-bincode", "de-cbor", "ser-cbor", "de-json", "ser-json", "de-taml", "de-urlencoded", "ser-urlencoded", "de-xml", "ser-xml", "de-yaml", "ser-yaml"]
