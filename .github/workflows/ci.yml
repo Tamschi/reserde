@@ -17,22 +17,6 @@ jobs:
     - run: cargo test --workspace --locked
     - run: cargo test --workspace --locked --all-features
 
-  browser-test:
-    name: Browser Test
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - uses: actions-rs/toolchain@v1.0.7
-      with:
-        toolchain: stable
-        profile: minimal
-        target: wasm32-unknown-unknown
-    - run: cargo +stable install wasm-bindgen-cli --vers "^0.2.71"
-    - run: cat CI.toml >> Cargo.toml
-    - run: cargo +stable test --workspace --locked --target wasm32-unknown-unknown --no-default-features
-    - run: cargo +stable test --workspace --locked --target wasm32-unknown-unknown
-    - run: cargo +stable test --workspace --locked --target wasm32-unknown-unknown --all-features
-
   check:
     name: Check on Rust ${{matrix.rust}}${{format(' ({0})', matrix.target || matrix.os)}}
     runs-on: ${{matrix.os}}-latest
