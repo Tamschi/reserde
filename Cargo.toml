@@ -8,8 +8,8 @@ license = "AGPL-3.0-or-later"
 repository = "https://github.com/Tamschi/reserde"
 homepage = "https://github.com/Tamschi/reserde/tree/v0.0.1"
 documentation = "https://docs.rs/reserde/0.0.1"
-keywords = [] #TODO
-categories = [] #TODO
+keywords = ["Serde", "cli", "converter"]
+categories = ["command-line-utilities", "converters"]
 readme = "README.md"
 include = [
 	"**/*.rs",

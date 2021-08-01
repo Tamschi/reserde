@@ -121,6 +121,7 @@ enum Encoding {
 	Utf8,
 }
 
+#[allow(clippy::too_many_lines)]
 fn main() {
 	let args: Args = argh::from_env();
 
@@ -139,15 +140,18 @@ fn main() {
 		}
 
 		#[cfg(feature = "de-cbor")]
-		In::Cbor => if let Some(path) = args.in_file {
-			File::open(path)
-				.unwrap()
-				.pipe(serde_cbor::from_reader)
-				.map(detach)
-		} else {
-			stdin().pipe(serde_cbor::from_reader).map(detach)
-		}
-		.unwrap(),
+		In::Cbor => args
+			.in_file
+			.map_or_else(
+				|| stdin().pipe(serde_cbor::from_reader).map(detach),
+				|path| {
+					File::open(path)
+						.unwrap()
+						.pipe(serde_cbor::from_reader)
+						.map(detach)
+				},
+			)
+			.unwrap(),
 
 		#[cfg(feature = "de-json")]
 		In::Json => {
@@ -177,15 +181,18 @@ fn main() {
 		}
 
 		#[cfg(feature = "de-urlencoded")]
-		In::Urlencoded => if let Some(path) = args.in_file {
-			File::open(path)
-				.unwrap()
-				.pipe(serde_urlencoded::from_reader)
-				.map(detach)
-		} else {
-			stdin().pipe(serde_urlencoded::from_reader).map(detach)
-		}
-		.unwrap(),
+		In::Urlencoded => args
+			.in_file
+			.map_or_else(
+				|| stdin().pipe(serde_urlencoded::from_reader).map(detach),
+				|path| {
+					File::open(path)
+						.unwrap()
+						.pipe(serde_urlencoded::from_reader)
+						.map(detach)
+				},
+			)
+			.unwrap(),
 
 		#[cfg(feature = "de-xml")]
 		In::Xml => {
@@ -212,12 +219,12 @@ fn main() {
 
 	#[cfg(feature = "stringify")]
 	for encoding in args.stringify {
-		stringify(&mut object, encoding)
+		stringify(&mut object, encoding);
 	}
 
 	#[cfg(feature = "enum-bools")]
 	if args.enum_bools {
-		convert_bool_variants(&mut object)
+		convert_bool_variants(&mut object);
 	}
 
 	let pretty = args.pretty;
@@ -243,27 +250,24 @@ fn main() {
 		}
 
 		#[cfg(feature = "ser-cbor")]
-		Out::Cbor => {
-			if let Some(path) = args.out_file {
-				serde_cbor::to_writer(File::create(path).unwrap(), &object).unwrap()
-			} else {
-				serde_cbor::to_writer(stdout(), &object).unwrap()
-			}
-		}
+		Out::Cbor => args.out_file.map_or_else(
+			|| serde_cbor::to_writer(stdout(), &object).unwrap(),
+			|path| serde_cbor::to_writer(File::create(path).unwrap(), &object).unwrap(),
+		),
 
 		#[cfg(feature = "ser-json")]
 		Out::Json => {
 			if let Some(path) = args.out_file {
 				let file = File::create(path).unwrap();
 				if pretty {
-					serde_json::to_writer_pretty(file, &object).unwrap()
+					serde_json::to_writer_pretty(file, &object).unwrap();
 				} else {
-					serde_json::to_writer(file, &object).unwrap()
+					serde_json::to_writer(file, &object).unwrap();
 				}
 			} else if pretty {
-				serde_json::to_writer_pretty(stdout(), &object).unwrap()
+				serde_json::to_writer_pretty(stdout(), &object).unwrap();
 			} else {
-				serde_json::to_writer(stdout(), &object).unwrap()
+				serde_json::to_writer(stdout(), &object).unwrap();
 			}
 		}
 
@@ -274,37 +278,36 @@ fn main() {
 			if let Some(path) = args.out_file {
 				write!(File::create(path).unwrap(), "{}", text).unwrap();
 			} else {
-				print!("{}", text)
+				print!("{}", text);
 			}
 		}
 
 		#[cfg(feature = "ser-xml")]
-		Out::Xml => {
-			if let Some(path) = args.out_file {
+		Out::Xml => args.out_file.map_or_else(
+			|| quick_xml::se::to_writer(stdout(), &object).unwrap(),
+			|path| {
 				let file = File::create(path).unwrap();
-				quick_xml::se::to_writer(file, &object).unwrap()
-			} else {
-				quick_xml::se::to_writer(stdout(), &object).unwrap()
-			}
-		}
+				quick_xml::se::to_writer(file, &object).unwrap();
+			},
+		),
 
 		#[cfg(feature = "ser-yaml")]
-		Out::Yaml => {
-			if let Some(path) = args.out_file {
+		Out::Yaml => args.out_file.map_or_else(
+			|| serde_yaml::to_writer(stdout(), &object).unwrap(),
+			|path| {
 				let file = File::create(path).unwrap();
-				serde_yaml::to_writer(file, &object).unwrap()
-			} else {
-				serde_yaml::to_writer(stdout(), &object).unwrap()
-			}
-		}
+				serde_yaml::to_writer(file, &object).unwrap();
+			},
+		),
 	};
 
-	stdout().flush().unwrap()
+	stdout().flush().unwrap();
 }
 
 // TODO: Simplify all this code by extracting a `recurse` function.
 
-fn convert_bool_variants<'a>(object: &mut Object<'a>) {
+fn convert_bool_variants(object: &mut Object) {
+	#[allow(clippy::match_same_arms)]
 	match object {
 		Object::Bool(_)
 		| Object::I8(_)
@@ -325,23 +328,23 @@ fn convert_bool_variants<'a>(object: &mut Object<'a>) {
 		| Object::Option(_)
 		| Object::Unit
 		| Object::UnitStruct { .. }
-		| Object::DualVariantKey { .. } => {} // Do nothing.
+		| Object::DualVariantKey { .. } => (), // Do nothing.
 		Object::UnitVariant { name: _, variant } => {
 			convert_bool_variants(variant);
 			match variant.as_ref() {
 				Object::String(cow) if cow.to_ascii_lowercase() == "true" => {
-					*object = Object::Bool(true)
+					*object = Object::Bool(true);
 				}
 				Object::String(cow) if cow.to_ascii_lowercase() == "false" => {
-					*object = Object::Bool(false)
+					*object = Object::Bool(false);
 				}
 				Object::ByteArray(cow) if cow.to_ascii_lowercase() == b"true" => {
-					*object = Object::Bool(true)
+					*object = Object::Bool(true);
 				}
 				Object::ByteArray(cow) if cow.to_ascii_lowercase() == b"false" => {
-					*object = Object::Bool(false)
+					*object = Object::Bool(false);
 				}
-				_ => {} // Do nothing.
+				_ => (), // Do nothing.
 			}
 		}
 		Object::NewtypeStruct { name: _, value } => convert_bool_variants(value),
@@ -351,7 +354,7 @@ fn convert_bool_variants<'a>(object: &mut Object<'a>) {
 			value,
 		} => {
 			convert_bool_variants(variant);
-			convert_bool_variants(value)
+			convert_bool_variants(value);
 		}
 		Object::Seq(elements)
 		| Object::Tuple(elements)
@@ -365,16 +368,16 @@ fn convert_bool_variants<'a>(object: &mut Object<'a>) {
 			fields,
 		} => {
 			convert_bool_variants(variant);
-			convert_bool_variants(fields)
+			convert_bool_variants(fields);
 		}
 		Object::Map(map) => {
 			for (k, v) in map.iter_mut() {
 				convert_bool_variants(k);
-				convert_bool_variants(v)
+				convert_bool_variants(v);
 			}
 		}
 		Object::Struct { name: _, fields } => {
-			convert_bool_variants_iter(fields.iter_mut().filter_map(|(_, v)| v.as_mut()))
+			convert_bool_variants_iter(fields.iter_mut().filter_map(|(_, v)| v.as_mut()));
 		}
 		Object::StructVariant {
 			name: _,
@@ -382,13 +385,13 @@ fn convert_bool_variants<'a>(object: &mut Object<'a>) {
 			fields,
 		} => {
 			convert_bool_variants(variant);
-			convert_bool_variants(fields)
+			convert_bool_variants(fields);
 		}
 		Object::FieldMap(map) => {
 			for (k, v) in map.iter_mut() {
 				convert_bool_variants(k);
 				if let Some(v) = v.as_mut() {
-					convert_bool_variants(v)
+					convert_bool_variants(v);
 				}
 			}
 		}
@@ -396,12 +399,13 @@ fn convert_bool_variants<'a>(object: &mut Object<'a>) {
 }
 
 fn convert_bool_variants_iter<'a, 'b: 'a>(iter: impl IntoIterator<Item = &'a mut Object<'b>>) {
-	for item in iter.into_iter() {
-		convert_bool_variants(item)
+	for item in iter {
+		convert_bool_variants(item);
 	}
 }
 
-fn stringify<'a>(object: &mut Object<'a>, encoding: Encoding) {
+fn stringify(object: &mut Object, encoding: Encoding) {
+	#[allow(clippy::match_same_arms)]
 	match object {
 		Object::Bool(_)
 		| Object::I8(_)
@@ -417,13 +421,13 @@ fn stringify<'a>(object: &mut Object<'a>, encoding: Encoding) {
 		| Object::F32(_)
 		| Object::F64(_)
 		| Object::Char(_)
-		| Object::String(_) => {} // Do nothing.
+		| Object::String(_) => (), // Do nothing.
 
-		Object::DualVariantKey { .. } => {} // Do nothing. A well-behaved serializer will get the appropriate version.
+		Object::DualVariantKey { .. } => (), // Do nothing. A well-behaved serializer will get the appropriate version.
 
 		Object::ByteArray(_) => stringify_value(object, encoding),
 		Object::Option(Some(b)) => stringify(b, encoding),
-		Object::Option(None) | Object::Unit | Object::UnitStruct { name: _ } => {} // Do nothing.
+		Object::Option(None) | Object::Unit | Object::UnitStruct { name: _ } => (), // Do nothing.
 		Object::UnitVariant { name: _, variant } => stringify_value(variant, encoding),
 		Object::NewtypeStruct { name: _, value } => stringify(value, encoding),
 		Object::NewtypeVariant {
@@ -432,7 +436,7 @@ fn stringify<'a>(object: &mut Object<'a>, encoding: Encoding) {
 			value,
 		} => {
 			stringify_value(variant, encoding);
-			stringify(value, encoding)
+			stringify(value, encoding);
 		}
 		Object::Seq(list) => stringify_keys_iter(list.iter_mut(), encoding),
 		Object::Tuple(fields) => stringify_keys_iter(fields.iter_mut(), encoding),
@@ -443,16 +447,16 @@ fn stringify<'a>(object: &mut Object<'a>, encoding: Encoding) {
 			fields,
 		} => {
 			stringify_value(variant, encoding);
-			stringify(fields.as_mut(), encoding)
+			stringify(fields.as_mut(), encoding);
 		}
 		Object::Map(map) => {
 			for (k, v) in map.iter_mut() {
 				stringify_value(k, encoding);
-				stringify(v, encoding)
+				stringify(v, encoding);
 			}
 		}
 		Object::Struct { name: _, fields } => {
-			stringify_keys_iter(fields.iter_mut().filter_map(|(_, v)| v.as_mut()), encoding)
+			stringify_keys_iter(fields.iter_mut().filter_map(|(_, v)| v.as_mut()), encoding);
 		}
 		Object::StructVariant {
 			name: _,
@@ -460,13 +464,13 @@ fn stringify<'a>(object: &mut Object<'a>, encoding: Encoding) {
 			fields,
 		} => {
 			stringify_value(variant, encoding);
-			stringify(fields, encoding)
+			stringify(fields, encoding);
 		}
 		Object::FieldMap(map) => {
 			for (k, v) in map.iter_mut() {
 				stringify_value(k, encoding);
 				if let Some(v) = v.as_mut() {
-					stringify(v, encoding)
+					stringify(v, encoding);
 				}
 			}
 		}
@@ -477,13 +481,14 @@ fn stringify_keys_iter<'a, 'b: 'a>(
 	iter: impl IntoIterator<Item = &'a mut Object<'b>>,
 	encoding: Encoding,
 ) {
-	for item in iter.into_iter() {
-		stringify(item, encoding)
+	for item in iter {
+		stringify(item, encoding);
 	}
 }
 
-fn stringify_value<'a>(object: &mut Object<'a>, encoding: Encoding) {
+fn stringify_value(object: &mut Object, encoding: Encoding) {
 	*object = Object::String(
+		#[allow(clippy::match_same_arms)]
 		match object {
 			Object::Bool(value) => value.to_string(),
 			Object::I8(value) => value.to_string(),
@@ -508,7 +513,7 @@ fn stringify_value<'a>(object: &mut Object<'a>, encoding: Encoding) {
 			},
 			Object::Option(option) => {
 				if let Some(obj) = option.as_deref_mut() {
-					stringify_value(obj, encoding)
+					stringify_value(obj, encoding);
 				}
 				return;
 			}
@@ -526,11 +531,11 @@ fn stringify_value<'a>(object: &mut Object<'a>, encoding: Encoding) {
 			| Object::StructVariant { .. } => {
 				return;
 			}
-			Object::DualVariantKey { index: _, name } => name.to_string(),
+			Object::DualVariantKey { index: _, name } => (*name).to_string(),
 			Object::FieldMap(_) => {
 				return;
 			}
 		}
 		.pipe(Cow::Owned),
-	)
+	);
 }
