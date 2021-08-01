@@ -62,7 +62,7 @@ serde_yaml = { version = "0.8.13", optional = true }
 serde-object = "0.0.0-alpha.0"
 serde-detach = "0.0.1"
 strum = { version = "0.19.1", features = ["derive"] }
-wyz = "0.2.0"
+wyz = "0.4.0"
 
 [dev-dependencies]
 cargo-husky = "1.5.0"
