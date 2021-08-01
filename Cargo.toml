@@ -56,7 +56,7 @@ serde = "1.0.114"
 serde_bencode = { version = "0.2.2", optional = true }
 serde_cbor = { version = "0.11.1", optional = true }
 serde_json = { version = "1.0.57", optional = true } #TODO: Check out features.
-serde_taml = { version = "0.0.1", optional = true, features = ["serde-object-assist"] }
+serde_taml = { version = "0.0.3", optional = true, features = ["serde-object-assist"] }
 serde_urlencoded = { version = "0.6.1", optional = true }
 serde_yaml = { version = "0.8.13", optional = true }
 serde-object = "0.0.0-alpha.0"
