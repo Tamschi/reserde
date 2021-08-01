@@ -49,6 +49,6 @@ jobs:
         toolchain: nightly
     - run: cat CI.toml >> Cargo.toml
     - run: cargo +nightly update -Z minimal-versions
-    - run: cargo +nightly check --lib --locked --no-default-features
-    - run: cargo +nightly check --lib --locked
-    - run: cargo +nightly check --lib --locked --all-features
+    - run: cargo +nightly check --bin reserde --locked --no-default-features
+    - run: cargo +nightly check --bin reserde --locked
+    - run: cargo +nightly check --bin reserde --locked --all-features
