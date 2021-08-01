@@ -2,9 +2,9 @@
 
 <!-- markdownlint-disable no-trailing-punctuation -->
 
-## next
+## 0.0.2
 
-TODO: Date
+2021-08-01
 
 - **Breaking**:
   - Increased minimum Rust version to 1.53.
