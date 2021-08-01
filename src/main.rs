@@ -1,3 +1,6 @@
+#![doc(html_root_url = "https://docs.rs/reserde/0.0.1")]
+#![warn(clippy::pedantic)]
+
 use argh::FromArgs;
 use serde_detach::detach;
 use serde_object::Object;

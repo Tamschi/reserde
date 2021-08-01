@@ -6,11 +6,28 @@ edition = "2018"
 description = "Serde-based CLI document converter (Bencode, CBOR, JSON, TAML, x-www-form-urlencoded etc.)"
 license = "AGPL-3.0-or-later"
 repository = "https://github.com/Tamschi/reserde"
+homepage = "https://github.com/Tamschi/reserde/tree/v0.0.1"
+documentation = "https://docs.rs/reserde/0.0.1"
+keywords = [] #TODO
+categories = [] #TODO
+readme = "README.md"
 include = [
 	"**/*.rs",
+	"!tests/unincluded_*.rs", # Tests of meta data files not included in the package.
 	"Cargo.toml",
+	"CHANGELOG.md",
+	"CODE_OF_CONDUCT.md",
+	"LICENSE-*",
+	"README.md",
+	"SECURITY.md",
 ]
+resolver = "2"
 publish = false
+
+[badges]
+is-it-maintained-issue-resolution = { repository = "Tamschi/reserde" }
+is-it-maintained-open-issues = { repository = "Tamschi/reserde" }
+maintenance = { status = "experimental" } # This may differ between branches.
 
 [features]
 default = ["enum-bools", "stringify", "de-bencode", "ser-bencode", "ser-bincode", "de-cbor", "ser-cbor", "de-json", "ser-json", "de-taml", "de-urlencoded", "ser-urlencoded", "de-xml", "ser-xml", "de-yaml", "ser-yaml"]
@@ -46,3 +63,10 @@ serde-object = "0.0.0-alpha.0"
 serde-detach = "0.0.1"
 strum = { version = "0.19.1", features = ["derive"] }
 wyz = "0.2.0"
+
+[dev-dependencies]
+cargo-husky = "1.5.0"
+doc-comment = "0.3.3"
+git_info = "0.1.2"
+version-sync = "0.9.1"
+wasm-bindgen-test = "0.3.24"
