@@ -11,7 +11,7 @@ use std::{
 	path::PathBuf,
 };
 use strum::EnumString;
-use wyz::Pipe as _;
+use tap::Pipe as _;
 
 #[derive(Debug, FromArgs)]
 /// Transcode a self-describing format into a different format.
@@ -41,80 +41,63 @@ struct Args {
 	/// pretty-print (where supported)
 	pretty: bool,
 
-	#[cfg(feature = "stringify")]
 	#[argh(option, short = 's')]
 	/// stringify bytes and non-string value keys into strings where possible, possible values are: utf8. (Tries encodings in the order specified.) [try with: --in bencode]
 	stringify: Vec<Encoding>,
 
-	#[cfg(feature = "enum-bools")]
 	#[argh(switch)]
-	/// case-insensitively convert unit variants with name `true` or `false` into booleans. [try with: --in taml]
+	/// case-insensitively convert unit variants with name `true` or `false` into booleans.
 	enum_bools: bool,
 }
 
 #[derive(Debug, EnumString, Clone, Copy)]
 enum In {
-	#[cfg(feature = "de-bencode")]
 	#[strum(serialize = "bencode")]
 	Bencode,
 
-	#[cfg(feature = "de-cbor")]
 	#[strum(serialize = "cbor")]
 	Cbor,
 
-	#[cfg(feature = "de-json")]
 	#[strum(serialize = "json")]
 	Json,
 
-	#[cfg(feature = "de-taml")]
 	#[strum(serialize = "taml")]
 	Taml,
 
-	#[cfg(feature = "de-urlencoded")]
 	#[strum(serialize = "urlencoded")]
 	Urlencoded,
 
-	#[cfg(feature = "de-xml")]
 	#[strum(serialize = "xml")]
 	Xml,
 
-	#[cfg(feature = "de-yaml")]
 	#[strum(serialize = "yaml")]
 	Yaml,
 }
 
 #[derive(Debug, EnumString, Clone, Copy)]
 enum Out {
-	#[cfg(feature = "ser-bencode")]
 	#[strum(serialize = "bencode")]
 	Bencode,
 
-	#[cfg(feature = "ser-bincode")]
 	#[strum(serialize = "bincode")]
 	Bincode,
 
-	#[cfg(feature = "ser-cbor")]
 	#[strum(serialize = "cbor")]
 	Cbor,
 
-	#[cfg(feature = "ser-json")]
 	#[strum(serialize = "json")]
 	Json,
 
-	#[cfg(feature = "ser-urlencoded")]
 	#[strum(serialize = "urlencoded")]
 	Urlencoded,
 
-	#[cfg(feature = "ser-xml")]
 	#[strum(serialize = "xml")]
 	Xml,
 
-	#[cfg(feature = "ser-yaml")]
 	#[strum(serialize = "yaml")]
 	Yaml,
 }
 
-#[cfg(feature = "stringify")]
 #[derive(Debug, EnumString, Clone, Copy)]
 enum Encoding {
 	#[strum(serialize = "utf8")]
@@ -128,7 +111,6 @@ fn main() {
 	//TODO: Avoid leaking.
 
 	let mut object: Object = match args.in_format {
-		#[cfg(feature = "de-bencode")]
 		In::Bencode => {
 			let mut data = vec![];
 			if let Some(path) = args.in_file {
@@ -139,7 +121,6 @@ fn main() {
 			serde_bencode::from_bytes(&data).map(detach).unwrap()
 		}
 
-		#[cfg(feature = "de-cbor")]
 		In::Cbor => args
 			.in_file
 			.map_or_else(
@@ -153,7 +134,6 @@ fn main() {
 			)
 			.unwrap(),
 
-		#[cfg(feature = "de-json")]
 		In::Json => {
 			let mut text = String::new();
 			if let Some(path) = args.in_file {
@@ -164,7 +144,6 @@ fn main() {
 			serde_json::from_str(&text).map(detach).unwrap()
 		}
 
-		#[cfg(feature = "de-taml")]
 		In::Taml => {
 			let diagnostics = vec![];
 			let diagnostics = Box::new(diagnostics);
@@ -175,12 +154,11 @@ fn main() {
 			} else {
 				stdin().read_to_string(&mut text).unwrap();
 			}
-			serde_taml::de::from_str(&text, diagnostics)
+			serde_taml::de::from_taml_str(&text, diagnostics, &[])
 				.map(detach)
 				.unwrap()
 		}
 
-		#[cfg(feature = "de-urlencoded")]
 		In::Urlencoded => args
 			.in_file
 			.map_or_else(
@@ -194,7 +172,6 @@ fn main() {
 			)
 			.unwrap(),
 
-		#[cfg(feature = "de-xml")]
 		In::Xml => {
 			let mut text = String::new();
 			if let Some(path) = args.in_file {
@@ -205,7 +182,6 @@ fn main() {
 			quick_xml::de::from_str(&text).map(detach).unwrap()
 		}
 
-		#[cfg(feature = "de-yaml")]
 		In::Yaml => {
 			let mut text = String::new();
 			if let Some(path) = args.in_file {
@@ -217,19 +193,16 @@ fn main() {
 		}
 	};
 
-	#[cfg(feature = "stringify")]
 	for encoding in args.stringify {
 		stringify(&mut object, encoding);
 	}
 
-	#[cfg(feature = "enum-bools")]
 	if args.enum_bools {
 		convert_bool_variants(&mut object);
 	}
 
 	let pretty = args.pretty;
 	match args.out_format {
-		#[cfg(feature = "ser-bencode")]
 		Out::Bencode => {
 			let data = serde_bencode::to_bytes(&object).unwrap();
 
@@ -240,7 +213,6 @@ fn main() {
 			}
 		}
 
-		#[cfg(feature = "ser-bincode")]
 		Out::Bincode => {
 			if let Some(path) = args.out_file {
 				bincode::serialize_into(File::create(path).unwrap(), &object).unwrap();
@@ -249,13 +221,11 @@ fn main() {
 			}
 		}
 
-		#[cfg(feature = "ser-cbor")]
 		Out::Cbor => args.out_file.map_or_else(
 			|| serde_cbor::to_writer(stdout(), &object).unwrap(),
 			|path| serde_cbor::to_writer(File::create(path).unwrap(), &object).unwrap(),
 		),
 
-		#[cfg(feature = "ser-json")]
 		Out::Json => {
 			if let Some(path) = args.out_file {
 				let file = File::create(path).unwrap();
@@ -271,7 +241,6 @@ fn main() {
 			}
 		}
 
-		#[cfg(feature = "ser-urlencoded")]
 		Out::Urlencoded => {
 			let text = serde_urlencoded::to_string(&object).unwrap();
 
@@ -282,7 +251,6 @@ fn main() {
 			}
 		}
 
-		#[cfg(feature = "ser-xml")]
 		Out::Xml => args.out_file.map_or_else(
 			|| quick_xml::se::to_writer(stdout(), &object).unwrap(),
 			|path| {
@@ -291,7 +259,6 @@ fn main() {
 			},
 		),
 
-		#[cfg(feature = "ser-yaml")]
 		Out::Yaml => args.out_file.map_or_else(
 			|| serde_yaml::to_writer(stdout(), &object).unwrap(),
 			|path| {

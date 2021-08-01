@@ -39,9 +39,9 @@ checksum = "cdb031dd78e28731d87d56cc8ffef4a8f36ca26c38fe2de700543e627f8a464a"
 
 [[package]]
 name = "beef"
-version = "0.4.4"
+version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "474a626a67200bd107d44179bb3d4fc61891172d11696609264589be6a0e6a43"
+checksum = "bed554bd50246729a1ec158d08aa3235d1b69d94ad120ebe187e28894787e736"
 
 [[package]]
 name = "bincode"
@@ -72,9 +72,9 @@ checksum = "7b02b629252fe8ef6460461409564e2c21d0c8e77e0944f3d189ff06c4e932ad"
 
 [[package]]
 name = "cervine"
-version = "0.0.2"
+version = "0.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2eb259a9b90ff20b2608f173b86e537a9a92eaf89dc65322c6ba537b5d75720d"
+checksum = "9f0db89834ef04fc63d2f136327b42d532b45def0345213d28690a3446c7bdb5"
 
 [[package]]
 name = "cfg-if"
@@ -100,9 +100,9 @@ dependencies = [
 
 [[package]]
 name = "debugless-unwrap"
-version = "0.0.1"
+version = "0.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a59fcc234b0a628ae47ebe2b298e347a7995fe4f0fcfe5e50ace780bffc062b7"
+checksum = "f400d0750c0c069e8493f2256cb4da6f604b6d2eeb69a0ca8863acde352f8400"
 
 [[package]]
 name = "doc-comment"
@@ -117,10 +117,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "56899898ce76aaf4a0f24d914c97ea6ed976d42fec6ad33fcbb0a1103e07b2b0"
 
 [[package]]
-name = "enum_properties"
-version = "0.2.1"
+name = "either"
+version = "1.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "75fd952080f7bd83714eb291f0c5d178099d4051e69be6701c61c3da3c202823"
+checksum = "e78d4f1cc4ae33bbfc157ed5d5a5ef3bc29227303d595861deb238fcec4e9457"
+
+[[package]]
+name = "enum_properties"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b69918c4fbd88f3465ed16714c0270c442abb11dab4cfe4a511f5632d3614384"
 
 [[package]]
 name = "fnv"
@@ -146,9 +152,9 @@ checksum = "641b847f0375f4b2c595438eefc17a9c0fbf47b400cbdd1ad9332bf1e16b779d"
 
 [[package]]
 name = "gnaw"
-version = "0.0.1"
+version = "0.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0e028ffaed016669f1c7af8eda847d292b120fb4283910b8f49f9906ca3ede09"
+checksum = "a79786fca5da31058bdc23d4a09a3b6ef0e1a77f6982cdcf6151bcbe41290d8b"
 
 [[package]]
 name = "half"
@@ -199,6 +205,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dd25036021b0de88a0aff6b850051563c6516d0bf53f8638938edbb9de732736"
 
 [[package]]
+name = "joinery"
+version = "2.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "72167d68f5fce3b8655487b8038691a3c9984ee769590f93f2a631f4ad64e4f5"
+
+[[package]]
 name = "js-sys"
 version = "0.3.51"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -209,9 +221,9 @@ dependencies = [
 
 [[package]]
 name = "lazy-transform-str"
-version = "0.0.1"
+version = "0.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "62a5f11cb98ed67b9fa80672f818f7f7baf2067d2603f1b547326d02dcb7052d"
+checksum = "d3f2f08de5da0353709e66c6302747c07d60186e70d19b172dbdcc51a1de357e"
 dependencies = [
  "cervine",
  "gnaw",
@@ -261,18 +273,18 @@ dependencies = [
 
 [[package]]
 name = "logos"
-version = "0.11.4"
+version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b91c49573597a5d6c094f9031617bb1fed15c0db68c81e6546d313414ce107e4"
+checksum = "427e2abca5be13136da9afdbf874e6b34ad9001dd70f2b103b083a85daa7b345"
 dependencies = [
  "logos-derive",
 ]
 
 [[package]]
 name = "logos-derive"
-version = "0.11.5"
+version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "797b1f8a0571b331c1b47e7db245af3dc634838da7a92b3bef4e30376ae1c347"
+checksum = "56a7d287fd2ac3f75b11f19a1c8a874a7d55744bd91f7a1b3e7cf87d4343c36d"
 dependencies = [
  "beef",
  "fnv",
@@ -294,6 +306,12 @@ name = "memchr"
 version = "2.3.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0ee1c47aaa256ecabcaea351eae4a9b01ef39ed810004e298d2511ed284b1525"
+
+[[package]]
+name = "paste"
+version = "1.0.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "acbf547ad0c65e31259204bd90935776d1c693cec2f4ff7abb7a1bbbd40dfe58"
 
 [[package]]
 name = "percent-encoding"
@@ -353,9 +371,9 @@ dependencies = [
 
 [[package]]
 name = "quick-xml"
-version = "0.18.1"
+version = "0.22.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3cc440ee4802a86e357165021e3e255a9143724da31db1e2ea540214c96a0f82"
+checksum = "8533f14c8382aaad0d592c812ac3b826162128b65662331e1127b45c3d18536b"
 dependencies = [
  "memchr",
  "serde",
@@ -405,9 +423,9 @@ dependencies = [
  "serde_urlencoded",
  "serde_yaml",
  "strum",
+ "tap",
  "version-sync",
  "wasm-bindgen-test",
- "wyz",
 ]
 
 [[package]]
@@ -415,6 +433,15 @@ name = "ryu"
 version = "1.0.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "71d301d4193d031abdd79ff7e3dd721168a9572ef3fe51a1517aba235bd8f86e"
+
+[[package]]
+name = "scientific"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "93eacd2134640ba4441b014236dee029672cea156c71552689cf29215a38ffa4"
+dependencies = [
+ "serde",
+]
 
 [[package]]
 name = "scoped-tls"
@@ -430,9 +457,9 @@ checksum = "b46e1121e8180c12ff69a742aabc4f310542b6ccb69f1691689ac17fdf8618aa"
 
 [[package]]
 name = "serde"
-version = "1.0.124"
+version = "1.0.127"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bd761ff957cb2a45fbb9ab3da6512de9de55872866160b23c25f1a841e99d29f"
+checksum = "f03b9878abf6d14e6779d3f24f07b2cfa90352cfec4acc5aab8f1ac7f146fae8"
 
 [[package]]
 name = "serde-detach"
@@ -499,31 +526,37 @@ dependencies = [
 
 [[package]]
 name = "serde_taml"
-version = "0.0.1"
+version = "0.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "02827e4cb9abd94452ea519a77afa784cf35e3f34ecc4ec76393d0ac5aa3ebed"
+checksum = "e7d009e4101a33444d18aae9b48a686e698444339c97a093ae94bfdf978b890a"
 dependencies = [
  "cervine",
+ "debugless-unwrap",
+ "either",
  "indexmap",
+ "joinery",
  "lazy_static",
  "linkme",
  "logos",
+ "paste",
+ "scientific",
  "serde",
  "serde-object",
  "taml",
- "wyz",
+ "tap",
+ "try_match",
 ]
 
 [[package]]
 name = "serde_urlencoded"
-version = "0.6.1"
+version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9ec5d77e2d4c73717816afac02670d5c4f534ea95ed430442cad02e7a6e32c97"
+checksum = "edfa57a7f8d9c1d260a549e7224100f6c43d43f9103e06dd8b4095a9b2b43ce9"
 dependencies = [
- "dtoa",
+ "form_urlencoded",
  "itoa",
+ "ryu",
  "serde",
- "url",
 ]
 
 [[package]]
@@ -555,18 +588,18 @@ checksum = "a2eb9349b6444b326872e140eb1cf5e7c522154d69e7a0ffb0fb81c06b37543f"
 
 [[package]]
 name = "strum"
-version = "0.19.5"
+version = "0.21.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b89a286a7e3b5720b9a477b23253bc50debac207c8d21505f8e70b36792f11b5"
+checksum = "aaf86bbcfd1fa9670b7a129f64fc0c9fcbbfe4f1bc4210e9e98fe71ffc12cde2"
 dependencies = [
  "strum_macros",
 ]
 
 [[package]]
 name = "strum_macros"
-version = "0.19.4"
+version = "0.21.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e61bb0be289045cb80bfce000512e32d09f8337e54c186725da381377ad1f8d5"
+checksum = "d06aaeeee809dbc59eb4556183dd927df67db1540de5be8d3ec0b6636358a5ec"
 dependencies = [
  "heck",
  "proc-macro2",
@@ -587,9 +620,9 @@ dependencies = [
 
 [[package]]
 name = "taml"
-version = "0.0.1"
+version = "0.0.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0109448947c4f6ef7a42d0b010e61a15a7223d975147969373c1e46d52189403"
+checksum = "793af72e6921e38ea0fd32101f32c5ba7a3be81529f3a958c4a1360afa2fdf59"
 dependencies = [
  "cervine",
  "debugless-unwrap",
@@ -599,8 +632,16 @@ dependencies = [
  "lazy-transform-str",
  "logos",
  "smartstring",
+ "syn",
+ "tap",
  "try_match",
 ]
+
+[[package]]
+name = "tap"
+version = "1.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "55937e1799185b12863d447f42597ed69d9928686b8d88a1df17376a097d8369"
 
 [[package]]
 name = "tinyvec"
