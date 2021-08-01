@@ -4,7 +4,7 @@
 [![Crates.io](https://img.shields.io/crates/v/reserde)](https://crates.io/crates/reserde)
 [![Docs.rs](https://docs.rs/reserde/badge.svg)](https://docs.rs/reserde)
 
-![Rust 1.51](https://img.shields.io/static/v1?logo=Rust&label=&message=1.51&color=grey)
+![Rust 1.53](https://img.shields.io/static/v1?logo=Rust&label=&message=1.53&color=grey)
 [![CI](https://github.com/Tamschi/reserde/workflows/CI/badge.svg?branch=develop)](https://github.com/Tamschi/reserde/actions?query=workflow%3ACI+branch%3Adevelop)
 ![Crates.io - License](https://img.shields.io/crates/l/reserde/0.0.1)
 
