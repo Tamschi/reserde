@@ -9,7 +9,7 @@ repository = "https://github.com/Tamschi/reserde"
 homepage = "https://github.com/Tamschi/reserde/tree/v0.0.2"
 documentation = "https://docs.rs/reserde/0.0.2"
 keywords = ["Serde", "cli", "converter"]
-categories = ["command-line-utilities", "converters"]
+categories = ["command-line-utilities", "encoding"]
 readme = "README.md"
 include = [
 	"**/*.rs",
