@@ -124,13 +124,8 @@ fn main() {
 		In::Cbor => args
 			.in_file
 			.map_or_else(
-				|| stdin().pipe(serde_cbor::from_reader).map(detach),
-				|path| {
-					File::open(path)
-						.unwrap()
-						.pipe(serde_cbor::from_reader)
-						.map(detach)
-				},
+				|| stdin().pipe(ciborium::de::from_reader),
+				|path| File::open(path).unwrap().pipe(ciborium::de::from_reader),
 			)
 			.unwrap(),
 
@@ -222,8 +217,8 @@ fn main() {
 		}
 
 		Out::Cbor => args.out_file.map_or_else(
-			|| serde_cbor::to_writer(stdout(), &object).unwrap(),
-			|path| serde_cbor::to_writer(File::create(path).unwrap(), &object).unwrap(),
+			|| ciborium::ser::into_writer(&object, stdout()).unwrap(),
+			|path| ciborium::ser::into_writer(&object, File::create(path).unwrap()).unwrap(),
 		),
 
 		Out::Json => {
