@@ -387,7 +387,6 @@ dependencies = [
  "serde_urlencoded",
  "serde_yaml",
  "strum",
- "syn",
  "tap",
  "version-sync",
 ]
