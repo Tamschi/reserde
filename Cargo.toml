@@ -49,7 +49,7 @@ ciborium = "0.1.0"
 cargo-husky = "1.5.0"
 doc-comment = "0.3.3"
 git_info = "0.1.2"
-version-sync = "0.9.1"
+version-sync = "0.9.3"
 
 [build-dependencies]
 syn = "1.0.76" # Workaround for strum minimum dependency version bug.
