@@ -52,4 +52,4 @@ git_info = "0.1.2"
 version-sync = "0.9.3"
 
 [build-dependencies]
-syn = "1.0.76" # Workaround for strum minimum dependency version bug.
+syn = "1.0.77" # Workaround for strum minimum dependency version bug.
