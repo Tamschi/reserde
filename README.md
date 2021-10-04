@@ -11,6 +11,8 @@
 [![GitHub](https://img.shields.io/static/v1?logo=GitHub&label=&message=%20&color=grey)](https://github.com/Tamschi/reserde)
 [![open issues](https://img.shields.io/github/issues-raw/Tamschi/reserde)](https://github.com/Tamschi/reserde/issues)
 [![open pull requests](https://img.shields.io/github/issues-pr-raw/Tamschi/reserde)](https://github.com/Tamschi/reserde/pulls)
+[![good first issues](https://img.shields.io/github/issues-raw/Tamschi/reserde/good%20first%20issue?label=good+first+issues)](https://github.com/Tamschi/reserde/contribute)
+
 [![crev reviews](https://web.crev.dev/rust-reviews/badge/crev_count/reserde.svg)](https://web.crev.dev/rust-reviews/crate/reserde/)
 
 A Serde-based document converter.
@@ -156,9 +158,9 @@ EmptyTuple()
 
 Licensed under either of
 
-* Apache License, Version 2.0
+- Apache License, Version 2.0
    ([LICENSE-APACHE](LICENSE-APACHE) or <http://www.apache.org/licenses/LICENSE-2.0>)
-* MIT license
+- MIT license
    ([LICENSE-MIT](LICENSE-MIT) or <http://opensource.org/licenses/MIT>)
 
 at your option.
@@ -169,6 +171,8 @@ Unless you explicitly state otherwise, any contribution intentionally submitted
 for inclusion in the work by you, as defined in the Apache-2.0 license, shall be
 dual licensed as above, without any additional terms or conditions.
 
+See [CONTRIBUTING](CONTRIBUTING.md) for more information.
+
 ## [Code of Conduct](CODE_OF_CONDUCT.md)
 
 ## [Changelog](CHANGELOG.md)
@@ -177,12 +181,15 @@ dual licensed as above, without any additional terms or conditions.
 
 `reserde` strictly follows [Semantic Versioning 2.0.0](https://semver.org/spec/v2.0.0.html) with the following exceptions:
 
-* The minor version will not reset to 0 on major version changes (except for v1).  
+- The minor version will not reset to 0 on major version changes (except for v1).  
 Consider it the global feature level.
-* The patch version will not reset to 0 on major or minor version changes (except for v0.1 and v1).  
+- The patch version will not reset to 0 on major or minor version changes (except for v0.1 and v1).  
 Consider it the global patch level.
 
 This includes the Rust version requirement specified above.  
 Earlier Rust versions may be compatible, but this can change with minor or patch releases.
 
 Which versions are affected by features and patches can be determined from the respective headings in [CHANGELOG.md](CHANGELOG.md).
+
+Note that dependencies of this crate may have a more lenient MSRV policy!
+Please use `cargo +nightly update -Z minimal-versions` in your automation if you don't generate Cargo.lock manually (or as necessary) and require support for a compiler older than current stable.
