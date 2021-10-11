@@ -41,7 +41,7 @@ serde_urlencoded = "0.7.0"
 serde_yaml = "0.8.21"
 serde-object = "0.0.0-alpha.0"
 serde-detach = "0.0.1"
-strum = { version = "0.21.0", features = ["derive"] }
+strum = { version = "0.22.0", features = ["derive"] }
 tap = "1.0.1"
 ciborium = "0.1.0"
 
