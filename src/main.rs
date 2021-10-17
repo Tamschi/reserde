@@ -28,11 +28,11 @@ struct Args {
 	/// where to write output to. Defaults to stdout
 	out_file: Option<PathBuf>,
 
-	#[structopt(short = "i", long = "in", possible_values = In::VARIANTS, help="input format")]
+	#[structopt(short = "i", long = "in", possible_values = In::VARIANTS)]
 	/// what to read
 	in_format: In,
 
-	#[structopt(short = "o", long = "out", possible_values = Out::VARIANTS, help="output format")]
+	#[structopt(short = "o", long = "out", possible_values = Out::VARIANTS)]
 	/// what to write
 	out_format: Out,
 
