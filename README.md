@@ -14,6 +14,7 @@
 [![good first issues](https://img.shields.io/github/issues-raw/Tamschi/reserde/good%20first%20issue?label=good+first+issues)](https://github.com/Tamschi/reserde/contribute)
 
 [![crev reviews](https://web.crev.dev/rust-reviews/badge/crev_count/reserde.svg)](https://web.crev.dev/rust-reviews/crate/reserde/)
+[![Zulip Chat](https://img.shields.io/endpoint?label=chat&url=https%3A%2F%2Fiteration-square-automation.schichler.dev%2F.netlify%2Ffunctions%2Fstream_subscribers_shield%3Fstream%3Dproject%252Freserde)](https://iteration-square.schichler.dev/#narrow/stream/project.2Freserde)
 
 A Serde-based document converter.
 
