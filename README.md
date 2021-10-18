@@ -32,22 +32,45 @@ reserde --help
 ```
 
 ```txt
-Usage: reserde.exe [--if <if>] [--of <of>] -i <in> -o <out> [-p] [-s <stringify...>] [--enum-bools]
+reserde 0.0.2
+Transcode a self-describing format into a different format.
 
-Transcode a self-describing format into a different format. Currently supports Bencode, Bincode (--out only), CBOR, JSON (--pretty), TAML (--in only), XML, x-www-form-urlencoded (as urlencoded) and YAML. All names are lowercase.
+Currently supports Bencode, Bincode (--out only), CBOR, JSON (--pretty), TAML (--in only), XML, x-www-form-urlencoded
+(as urlencoded) and YAML. All names are lowercase.
 
-Options:
-  --if              where to read input from. Defaults to stdin
-  --of              where to write output to. Defaults to stdout
-  -i, --in          what to read
-  -o, --out         what to write
-  -p, --pretty      pretty-print (where supported)
-  -s, --stringify   stringify bytes and non-string value keys into strings where
-                    possible, possible values are: utf8. (Tries encodings in the
-                    order specified.) [try with: --in bencode]
-  --enum-bools      case-insensitively convert unit variants with name `true` or
-                    `false` into booleans.
-  --help            display usage information
+USAGE:
+    reserde [FLAGS] [OPTIONS] --in <in-format> --out <out-format>
+
+FLAGS:
+        --enum-bools
+            case-insensitively convert unit variants with name `true` or `false` into booleans
+
+    -h, --help
+            Prints help information
+
+    -p
+            pretty-print (where supported)
+
+    -V, --version
+            Prints version information
+
+
+OPTIONS:
+        --if <in-file>
+            where to read input from. Defaults to stdin
+
+    -i, --in <in-format>
+            what to read [possible values: bencode, cbor, json, taml, urlencoded, xml, yaml]
+
+        --of <out-file>
+            where to write output to. Defaults to stdout
+
+    -o, --out <out-format>
+            what to write [possible values: bencode, bincode, cbor, json, urlencoded, xml, yaml]
+
+    -s <stringify>...
+            stringify bytes and non-string value keys into strings where possible, possible values are: utf8. (Tries
+            encodings in the order specified.) [try with: --in bencode]
 ```
 
 ## Examples
