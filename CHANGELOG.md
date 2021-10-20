@@ -2,6 +2,12 @@
 
 <!-- markdownlint-disable no-trailing-punctuation -->
 
+## 0.0.3
+
+- Features
+  - `-h` made alternate option to display help.
+  - in/out now show valid choices with --help command.
+
 ## 0.0.2
 
 2021-08-01
