@@ -2,11 +2,14 @@
 
 <!-- markdownlint-disable no-trailing-punctuation -->
 
-## 0.0.3
+## next
 
-- Features
-  - `-h` made alternate option to display help.
-  - in/out now show valid choices with --help command.
+TODO: Date
+
+- Features:
+  - `-h` made alternate option to display help. (contributed by @scribe in #31 and #32)
+    > This is implemented by switching to `structopt` for argument parsing.  
+    > Additionally, `--in` and `--out` now show valid choices with the `-h`/`--help` command.
 
 ## 0.0.2
 
