@@ -40,8 +40,8 @@ struct Args {
 	/// pretty-print (where supported)
 	pretty: bool,
 
-	#[structopt(short = "s")]
-	/// stringify bytes and non-string value keys into strings where possible, possible values are: utf8. (Tries encodings in the order specified.) [try with: --in bencode]
+	#[structopt(short = "s", possible_values = Encoding::VARIANTS)]
+	/// stringify bytes and non-string value keys into strings where possible. (Tries encodings in the order specified.) [try with: --in bencode]
 	stringify: Vec<Encoding>,
 
 	#[structopt(long = "enum-bools")]
@@ -97,7 +97,7 @@ enum Out {
 	Yaml,
 }
 
-#[derive(Debug, EnumString, Clone, Copy)]
+#[derive(Debug, EnumString, EnumVariantNames, Clone, Copy)]
 enum Encoding {
 	#[strum(serialize = "utf8")]
 	Utf8,
