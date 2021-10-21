@@ -1,7 +1,6 @@
-#![doc(html_root_url = "https://docs.rs/reserde/0.0.2")]
+#![doc(html_root_url = "https://docs.rs/reserde/0.0.3")]
 #![warn(clippy::pedantic)]
 
-use argh::FromArgs;
 use serde_detach::detach;
 use serde_object::Object;
 use std::{
@@ -10,47 +9,47 @@ use std::{
 	io::{stdin, stdout, Read as _, Write as _},
 	path::PathBuf,
 };
-use strum::EnumString;
+use structopt::StructOpt;
+use strum::{EnumString, EnumVariantNames, VariantNames};
 use tap::Pipe as _;
 
-#[derive(Debug, FromArgs)]
+#[derive(Debug, StructOpt)]
+#[structopt(name = "reserde")]
 /// Transcode a self-describing format into a different format.
 ///
 /// Currently supports Bencode, Bincode (--out only), CBOR, JSON (--pretty), TAML (--in only), XML, x-www-form-urlencoded (as urlencoded) and YAML.
 /// All names are lowercase.
 struct Args {
-	#[argh(option, long = "if")]
+	#[structopt(long = "if")]
 	/// where to read input from. Defaults to stdin
 	in_file: Option<PathBuf>,
 
-	#[argh(option, long = "of")]
+	#[structopt(long = "of")]
 	/// where to write output to. Defaults to stdout
 	out_file: Option<PathBuf>,
 
-	//TODO: List In variant.
-	#[argh(option, short = 'i', long = "in")]
+	#[structopt(short = "i", long = "in", possible_values = In::VARIANTS)]
 	/// what to read
 	in_format: In,
 
-	//TODO: List Out variant.
-	#[argh(option, short = 'o', long = "out")]
+	#[structopt(short = "o", long = "out", possible_values = Out::VARIANTS)]
 	/// what to write
 	out_format: Out,
 
-	#[argh(switch, short = 'p')]
+	#[structopt(short = "p")]
 	/// pretty-print (where supported)
 	pretty: bool,
 
-	#[argh(option, short = 's')]
-	/// stringify bytes and non-string value keys into strings where possible, possible values are: utf8. (Tries encodings in the order specified.) [try with: --in bencode]
+	#[structopt(short = "s", possible_values = Encoding::VARIANTS)]
+	/// stringify bytes and non-string value keys into strings where possible. (Tries encodings in the order specified.) [try with: --in bencode]
 	stringify: Vec<Encoding>,
 
-	#[argh(switch)]
+	#[structopt(long = "enum-bools")]
 	/// case-insensitively convert unit variants with name `true` or `false` into booleans.
 	enum_bools: bool,
 }
 
-#[derive(Debug, EnumString, Clone, Copy)]
+#[derive(Debug, EnumString, EnumVariantNames, Clone, Copy)]
 enum In {
 	#[strum(serialize = "bencode")]
 	Bencode,
@@ -74,7 +73,7 @@ enum In {
 	Yaml,
 }
 
-#[derive(Debug, EnumString, Clone, Copy)]
+#[derive(Debug, EnumString, EnumVariantNames, Clone, Copy)]
 enum Out {
 	#[strum(serialize = "bencode")]
 	Bencode,
@@ -98,7 +97,7 @@ enum Out {
 	Yaml,
 }
 
-#[derive(Debug, EnumString, Clone, Copy)]
+#[derive(Debug, EnumString, EnumVariantNames, Clone, Copy)]
 enum Encoding {
 	#[strum(serialize = "utf8")]
 	Utf8,
@@ -106,7 +105,7 @@ enum Encoding {
 
 #[allow(clippy::too_many_lines)]
 fn main() {
-	let args: Args = argh::from_env();
+	let args: Args = StructOpt::from_args();
 
 	//TODO: Avoid leaking.
 
@@ -124,13 +123,8 @@ fn main() {
 		In::Cbor => args
 			.in_file
 			.map_or_else(
-				|| stdin().pipe(serde_cbor::from_reader).map(detach),
-				|path| {
-					File::open(path)
-						.unwrap()
-						.pipe(serde_cbor::from_reader)
-						.map(detach)
-				},
+				|| stdin().pipe(ciborium::de::from_reader),
+				|path| File::open(path).unwrap().pipe(ciborium::de::from_reader),
 			)
 			.unwrap(),
 
@@ -222,8 +216,8 @@ fn main() {
 		}
 
 		Out::Cbor => args.out_file.map_or_else(
-			|| serde_cbor::to_writer(stdout(), &object).unwrap(),
-			|path| serde_cbor::to_writer(File::create(path).unwrap(), &object).unwrap(),
+			|| ciborium::ser::into_writer(&object, stdout()).unwrap(),
+			|path| ciborium::ser::into_writer(&object, File::create(path).unwrap()).unwrap(),
 		),
 
 		Out::Json => {
