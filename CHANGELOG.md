@@ -2,9 +2,9 @@
 
 <!-- markdownlint-disable no-trailing-punctuation -->
 
-## next
+## 0.0.4
 
-TODO: Date
+2021-10-21
 
 - Revisions:
   - Corrected the `package.license` field in Cargo.toml. Sorry about that.

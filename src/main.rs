@@ -1,4 +1,4 @@
-#![doc(html_root_url = "https://docs.rs/reserde/0.0.3")]
+#![doc(html_root_url = "https://docs.rs/reserde/0.0.4")]
 #![warn(clippy::pedantic)]
 
 use serde_detach::detach;
