@@ -11,6 +11,9 @@ TODO: Date
     > This is implemented by switching to `structopt` for argument parsing.  
     > Additionally, `--in` and `--out` now show valid choices with the `-h`/`--help` command.
 
+- Revisions:
+  - Updated dependencies.
+
 ## 0.0.2
 
 2021-08-01
