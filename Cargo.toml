@@ -1,13 +1,13 @@
 [package]
 name = "reserde"
-version = "0.0.2"
+version = "0.0.3"
 authors = ["Tamme Schichler <tamme@schichler.dev>"]
 edition = "2018"
 description = "Serde-based CLI document converter (Bencode, CBOR, JSON, TAML, x-www-form-urlencoded etc.)"
 license = "AGPL-3.0-or-later"
 repository = "https://github.com/Tamschi/reserde"
-homepage = "https://github.com/Tamschi/reserde/tree/v0.0.2"
-documentation = "https://docs.rs/reserde/0.0.2"
+homepage = "https://github.com/Tamschi/reserde/tree/v0.0.3"
+documentation = "https://docs.rs/reserde/0.0.3"
 keywords = ["Serde", "cli", "converter"]
 categories = ["command-line-utilities", "encoding"]
 readme = "README.md"

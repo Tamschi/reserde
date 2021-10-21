@@ -6,7 +6,7 @@
 
 ![Rust 1.53](https://img.shields.io/static/v1?logo=Rust&label=&message=1.53&color=grey)
 [![CI](https://github.com/Tamschi/reserde/workflows/CI/badge.svg?branch=develop)](https://github.com/Tamschi/reserde/actions?query=workflow%3ACI+branch%3Adevelop)
-![Crates.io - License](https://img.shields.io/crates/l/reserde/0.0.2)
+![Crates.io - License](https://img.shields.io/crates/l/reserde/0.0.3)
 
 [![GitHub](https://img.shields.io/static/v1?logo=GitHub&label=&message=%20&color=grey)](https://github.com/Tamschi/reserde)
 [![open issues](https://img.shields.io/github/issues-raw/Tamschi/reserde)](https://github.com/Tamschi/reserde/issues)
@@ -33,14 +33,14 @@ reserde --help
 ```
 
 ```txt
-reserde 0.0.2
+reserde 0.0.3
 Transcode a self-describing format into a different format.
 
 Currently supports Bencode, Bincode (--out only), CBOR, JSON (--pretty), TAML (--in only), XML, x-www-form-urlencoded
 (as urlencoded) and YAML. All names are lowercase.
 
 USAGE:
-    reserde [FLAGS] [OPTIONS] --in <in-format> --out <out-format>
+    reserde.exe [FLAGS] [OPTIONS] --in <in-format> --out <out-format>
 
 FLAGS:
         --enum-bools
@@ -70,8 +70,8 @@ OPTIONS:
             what to write [possible values: bencode, bincode, cbor, json, urlencoded, xml, yaml]
 
     -s <stringify>...
-            stringify bytes and non-string value keys into strings where possible, possible values are: utf8. (Tries
-            encodings in the order specified.) [try with: --in bencode]
+            stringify bytes and non-string value keys into strings where possible. (Tries encodings in the order
+            specified.) [try with: --in bencode] [possible values: utf8]
 ```
 
 ## Examples

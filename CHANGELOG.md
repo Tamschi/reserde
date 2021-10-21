@@ -2,9 +2,9 @@
 
 <!-- markdownlint-disable no-trailing-punctuation -->
 
-## next
+## 0.0.3
 
-TODO: Date
+2021-10-21
 
 - Features:
   - `-h` made alternate option to display help. (contributed by @scribe in #31 and #32)
