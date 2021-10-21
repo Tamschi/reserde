@@ -11,7 +11,10 @@
 [![GitHub](https://img.shields.io/static/v1?logo=GitHub&label=&message=%20&color=grey)](https://github.com/Tamschi/reserde)
 [![open issues](https://img.shields.io/github/issues-raw/Tamschi/reserde)](https://github.com/Tamschi/reserde/issues)
 [![open pull requests](https://img.shields.io/github/issues-pr-raw/Tamschi/reserde)](https://github.com/Tamschi/reserde/pulls)
+[![good first issues](https://img.shields.io/github/issues-raw/Tamschi/reserde/good%20first%20issue?label=good+first+issues)](https://github.com/Tamschi/reserde/contribute)
+
 [![crev reviews](https://web.crev.dev/rust-reviews/badge/crev_count/reserde.svg)](https://web.crev.dev/rust-reviews/crate/reserde/)
+[![Zulip Chat](https://img.shields.io/endpoint?label=chat&url=https%3A%2F%2Fiteration-square-automation.schichler.dev%2F.netlify%2Ffunctions%2Fstream_subscribers_shield%3Fstream%3Dproject%252Freserde)](https://iteration-square.schichler.dev/#narrow/stream/project.2Freserde)
 
 A Serde-based document converter.
 
@@ -30,22 +33,45 @@ reserde --help
 ```
 
 ```txt
-Usage: reserde.exe [--if <if>] [--of <of>] -i <in> -o <out> [-p] [-s <stringify...>] [--enum-bools]
+reserde 0.0.2
+Transcode a self-describing format into a different format.
 
-Transcode a self-describing format into a different format. Currently supports Bencode, Bincode (--out only), CBOR, JSON (--pretty), TAML (--in only), XML, x-www-form-urlencoded (as urlencoded) and YAML. All names are lowercase.
+Currently supports Bencode, Bincode (--out only), CBOR, JSON (--pretty), TAML (--in only), XML, x-www-form-urlencoded
+(as urlencoded) and YAML. All names are lowercase.
 
-Options:
-  --if              where to read input from. Defaults to stdin
-  --of              where to write output to. Defaults to stdout
-  -i, --in          what to read
-  -o, --out         what to write
-  -p, --pretty      pretty-print (where supported)
-  -s, --stringify   stringify bytes and non-string value keys into strings where
-                    possible, possible values are: utf8. (Tries encodings in the
-                    order specified.) [try with: --in bencode]
-  --enum-bools      case-insensitively convert unit variants with name `true` or
-                    `false` into booleans.
-  --help            display usage information
+USAGE:
+    reserde [FLAGS] [OPTIONS] --in <in-format> --out <out-format>
+
+FLAGS:
+        --enum-bools
+            case-insensitively convert unit variants with name `true` or `false` into booleans
+
+    -h, --help
+            Prints help information
+
+    -p
+            pretty-print (where supported)
+
+    -V, --version
+            Prints version information
+
+
+OPTIONS:
+        --if <in-file>
+            where to read input from. Defaults to stdin
+
+    -i, --in <in-format>
+            what to read [possible values: bencode, cbor, json, taml, urlencoded, xml, yaml]
+
+        --of <out-file>
+            where to write output to. Defaults to stdout
+
+    -o, --out <out-format>
+            what to write [possible values: bencode, bincode, cbor, json, urlencoded, xml, yaml]
+
+    -s <stringify>...
+            stringify bytes and non-string value keys into strings where possible, possible values are: utf8. (Tries
+            encodings in the order specified.) [try with: --in bencode]
 ```
 
 ## Examples
@@ -101,6 +127,8 @@ layers: 1
 first-interval-no-min: true
 interval-range: (10, 60)
 volume-range: (0.1, 0.15)
+
+##
 `spaced \` identifier`: "asdhasd kjhdajkh"
 ```
 
@@ -124,7 +152,7 @@ soundscapes:
         volume-range:
           - 0.1
           - 0.15
-        "spaced ` identifier": asdhasd kjhdajkh
+    "spaced ` identifier": asdhasd kjhdajkh
 ```
 
 (Comments are generally stripped, as they can't be sent across Serde's interface.)
@@ -154,9 +182,9 @@ EmptyTuple()
 
 Licensed under either of
 
-* Apache License, Version 2.0
+- Apache License, Version 2.0
    ([LICENSE-APACHE](LICENSE-APACHE) or <http://www.apache.org/licenses/LICENSE-2.0>)
-* MIT license
+- MIT license
    ([LICENSE-MIT](LICENSE-MIT) or <http://opensource.org/licenses/MIT>)
 
 at your option.
@@ -167,6 +195,8 @@ Unless you explicitly state otherwise, any contribution intentionally submitted
 for inclusion in the work by you, as defined in the Apache-2.0 license, shall be
 dual licensed as above, without any additional terms or conditions.
 
+See [CONTRIBUTING](CONTRIBUTING.md) for more information.
+
 ## [Code of Conduct](CODE_OF_CONDUCT.md)
 
 ## [Changelog](CHANGELOG.md)
@@ -175,12 +205,15 @@ dual licensed as above, without any additional terms or conditions.
 
 `reserde` strictly follows [Semantic Versioning 2.0.0](https://semver.org/spec/v2.0.0.html) with the following exceptions:
 
-* The minor version will not reset to 0 on major version changes (except for v1).  
+- The minor version will not reset to 0 on major version changes (except for v1).  
 Consider it the global feature level.
-* The patch version will not reset to 0 on major or minor version changes (except for v0.1 and v1).  
+- The patch version will not reset to 0 on major or minor version changes (except for v0.1 and v1).  
 Consider it the global patch level.
 
 This includes the Rust version requirement specified above.  
 Earlier Rust versions may be compatible, but this can change with minor or patch releases.
 
 Which versions are affected by features and patches can be determined from the respective headings in [CHANGELOG.md](CHANGELOG.md).
+
+Note that dependencies of this crate may have a more lenient MSRV policy!
+Please use `cargo +nightly update -Z minimal-versions` in your automation if you don't generate Cargo.lock manually (or as necessary) and require support for a compiler older than current stable.
