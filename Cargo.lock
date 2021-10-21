@@ -408,7 +408,6 @@ dependencies = [
  "serde_yaml",
  "structopt",
  "strum",
- "syn",
  "tap",
  "version-sync",
 ]
