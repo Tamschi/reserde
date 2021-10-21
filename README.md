@@ -6,7 +6,7 @@
 
 ![Rust 1.53](https://img.shields.io/static/v1?logo=Rust&label=&message=1.53&color=grey)
 [![CI](https://github.com/Tamschi/reserde/workflows/CI/badge.svg?branch=unstable)](https://github.com/Tamschi/reserde/actions?query=workflow%3ACI+branch%3Aunstable)
-![Crates.io - License](https://img.shields.io/crates/l/reserde/0.0.3)
+![Crates.io - License](https://img.shields.io/crates/l/reserde/0.0.4)
 
 [![GitHub](https://img.shields.io/static/v1?logo=GitHub&label=&message=%20&color=grey)](https://github.com/Tamschi/reserde)
 [![open issues](https://img.shields.io/github/issues-raw/Tamschi/reserde)](https://github.com/Tamschi/reserde/issues)
@@ -33,7 +33,7 @@ reserde --help
 ```
 
 ```txt
-reserde 0.0.3
+reserde 0.0.4
 Transcode a self-describing format into a different format.
 
 Currently supports Bencode, Bincode (--out only), CBOR, JSON (--pretty), TAML (--in only), XML, x-www-form-urlencoded
